@@ -146,6 +146,31 @@ th.serial-cell,td.serial-cell{
 </style>
 </head>
 <body>
+  <div id="google-login" style="text-align:center;margin:15px 0;"></div>
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
+<script>
+window.addEventListener('load', function () {
+  google.accounts.id.initialize({
+    client_id: '181382887608-99h18jllkhmkasa5g6n6i4c8idrjn4aq.apps.googleusercontent.com',
+    callback: function (response) {
+      console.log('Google login successful');
+      console.log(response);
+    }
+  });
+
+  google.accounts.id.renderButton(
+    document.getElementById('google-login'),
+    {
+      theme: 'outline',
+      size: 'large',
+      text: 'signin_with',
+      shape: 'rectangular'
+    }
+  );
+});
+</script>
 <header><h1>منصة المعلم</h1><div class="teacher">الأستاذ حسن يحيى الشهري</div></header>
 <main id="app"></main>
 <script>
