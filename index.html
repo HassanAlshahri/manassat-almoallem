@@ -149,7 +149,11 @@ th.serial-cell,td.serial-cell{
   <div id="google-login" style="text-align:center;margin:15px 0;"></div>
 
 <script src="https://accounts.google.com/gsi/client" async defer></script>
-
+<div style="text-align:center;margin:15px 0;">
+  <button id="drive-sync-btn" onclick="connectGoogleDrive()">
+    ☁️ ربط Google Drive
+  </button>
+</div>
 <script>
 window.addEventListener('load', function () {
   google.accounts.id.initialize({
@@ -170,6 +174,32 @@ window.addEventListener('load', function () {
     }
   );
 });
+  let driveTokenClient;
+
+function connectGoogleDrive() {
+  driveTokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: '181382887608-99h18jllkhmkasa5g6n6i4c8idrjn4aq.apps.googleusercontent.com',
+    scope: 'https://www.googleapis.com/auth/drive.file',
+    callback: function(response) {
+      if (response.error) {
+        console.error(response);
+        alert('حدث خطأ أثناء ربط Google Drive');
+        return;
+      }
+
+      localStorage.setItem('googleDriveAccessToken', response.access_token);
+
+      const btn = document.getElementById('drive-sync-btn');
+      if (btn) {
+        btn.textContent = '✅ تم ربط Google Drive';
+      }
+
+      alert('تم ربط Google Drive بنجاح ✅');
+    }
+  });
+
+  driveTokenClient.requestAccessToken();
+}
 </script>
 <header><h1>منصة المعلم</h1><div class="teacher">الأستاذ حسن يحيى الشهري</div></header>
 <main id="app"></main>
