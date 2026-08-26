@@ -214,22 +214,503 @@ th.serial-cell,td.serial-cell{
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script>
   const GOOGLE_CLIENT_ID='181382887608-99h18jllkhmkasa5g6n6i4c8idrjn4aq.apps.googleusercontent.com';
-  const DRIVE_SCOPE='https://www.googleapis.com/auth/drive.file';
-  const DRIVE_FILE_NAME='teacher_platform_data.json';
-  let driveTokenClient=null,driveAccessToken=localStorage.getItem('googleDriveAccessToken')||'',driveTokenExpiresAt=Number(localStorage.getItem('googleDriveTokenExpiresAt')||0),pendingDriveAction=null;
-  function updateDriveButton(){const b=document.getElementById('drive-sync-btn');if(b)b.textContent=localStorage.getItem('teacherPlatformDriveFileId')?'☁️ Google Drive مرتبط':'☁️ ربط Google Drive'}
-  window.addEventListener('load',()=>{if(!window.google||!google.accounts||!google.accounts.oauth2){setTimeout(updateDriveButton,800);return}driveTokenClient=google.accounts.oauth2.initTokenClient({client_id:GOOGLE_CLIENT_ID,scope:DRIVE_SCOPE,callback:handleDriveToken});updateDriveButton()});
-  function connectGoogleDrive(){pendingDriveAction='connect';requestDriveToken(true)}
-  function requestDriveToken(interactive=false){if(!driveTokenClient){alert('جارٍ تجهيز خدمة Google، حاول مرة أخرى بعد لحظات.');return}if(driveAccessToken&&Date.now()<driveTokenExpiresAt-30000){handleDriveToken({access_token:driveAccessToken,expires_in:Math.max(60,Math.floor((driveTokenExpiresAt-Date.now())/1000))});return}driveTokenClient.requestAccessToken({prompt:interactive?'consent':''})}
-  async function handleDriveToken(r){if(r.error){console.error(r);alert('حدث خطأ أثناء الاتصال بـ Google Drive.');return}driveAccessToken=r.access_token;driveTokenExpiresAt=Date.now()+((r.expires_in||3600)*1000);localStorage.setItem('googleDriveAccessToken',driveAccessToken);localStorage.setItem('googleDriveTokenExpiresAt',String(driveTokenExpiresAt));const a=pendingDriveAction||'connect';pendingDriveAction=null;try{if(a==='connect'){const cloud=await findDriveFile();if(cloud){localStorage.setItem('teacherPlatformDriveFileId',cloud.id);const hasLocal=Object.values(data||{}).some(v=>v&&Array.isArray(v.students)&&v.students.length);if(!hasLocal)await downloadFromGoogleDrive(false);else await syncToGoogleDrive(false)}else await syncToGoogleDrive(false);updateDriveButton();alert('تم ربط Google Drive بنجاح ✅')}else if(a==='upload')await syncToGoogleDrive(false);else if(a==='download')await downloadFromGoogleDrive(true)}catch(e){console.error(e);alert('تعذر إكمال عملية Google Drive. تأكد من اتصال الإنترنت وإعدادات OAuth.')}}
-  async function driveFetch(url,opt={}){const h=new Headers(opt.headers||{});h.set('Authorization','Bearer '+driveAccessToken);const r=await fetch(url,{...opt,headers:h});if(!r.ok)throw new Error(await r.text());return r}
-  async function findDriveFile(){const q=encodeURIComponent(`name='${DRIVE_FILE_NAME}' and trashed=false`);const r=await driveFetch(`https://www.googleapis.com/drive/v3/files?q=${q}&spaces=drive&fields=files(id,name,modifiedTime)`);const j=await r.json();return j.files&&j.files[0]||null}
-  function buildDrivePayload(){return{app:'منصة المعلم',version:'2.0',modifiedAt:localStorage.getItem('teacherPlatformLastModified')||new Date().toISOString(),exportedAt:new Date().toISOString(),data:data}}
-  async function uploadDriveFile(id){const meta={name:DRIVE_FILE_NAME,mimeType:'application/json'},b='teacher_platform_'+Date.now(),body=[`--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n`,JSON.stringify(meta),`\r\n--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n`,JSON.stringify(buildDrivePayload()),`\r\n--${b}--`].join('');const url=id?`https://www.googleapis.com/upload/drive/v3/files/${id}?uploadType=multipart`:'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart';const r=await driveFetch(url,{method:id?'PATCH':'POST',headers:{'Content-Type':`multipart/related; boundary=${b}`},body});const j=await r.json();localStorage.setItem('teacherPlatformDriveFileId',j.id);localStorage.setItem('teacherPlatformLastSync',new Date().toISOString());return j}
-  async function syncToGoogleDrive(show=true){if(!driveAccessToken||Date.now()>=driveTokenExpiresAt-30000){pendingDriveAction='upload';requestDriveToken(false);return}let id=localStorage.getItem('teacherPlatformDriveFileId');if(!id){const f=await findDriveFile();id=f&&f.id||''}await uploadDriveFile(id);if(show)alert('تم رفع أحدث البيانات إلى Google Drive بنجاح ☁️');refreshSyncStatus()}
-  async function downloadFromGoogleDrive(show=true){if(!driveAccessToken||Date.now()>=driveTokenExpiresAt-30000){pendingDriveAction='download';requestDriveToken(false);return}let id=localStorage.getItem('teacherPlatformDriveFileId');if(!id){const f=await findDriveFile();id=f&&f.id}if(!id){alert('لا توجد نسخة محفوظة على Google Drive بعد.');return}const r=await driveFetch(`https://www.googleapis.com/drive/v3/files/${id}?alt=media`),p=await r.json();if(!p.data)throw new Error('invalid cloud data');data=p.data;classes.forEach(c=>{data[c]??={students:[],attendance:{}};data[c].students??=[];data[c].attendance??={};});localStorage.setItem('teacherPlatformReports',JSON.stringify(data));localStorage.setItem('teacherPlatformLastModified',p.modifiedAt||new Date().toISOString());localStorage.setItem('teacherPlatformDriveFileId',id);localStorage.setItem('teacherPlatformLastSync',new Date().toISOString());if(show)alert('تم تحميل بياناتك من Google Drive بنجاح ☁️');refreshSyncStatus();home()}
-  function manualDriveUpload(){pendingDriveAction='upload';requestDriveToken(false)}
-  function manualDriveDownload(){if(!confirm('سيتم استبدال البيانات الموجودة على هذا الجهاز بالنسخة المحفوظة في Google Drive. هل تريد المتابعة؟'))return;pendingDriveAction='download';requestDriveToken(false)}
+const DRIVE_SCOPE='https://www.googleapis.com/auth/drive.file';
+const DRIVE_FILE_NAME='teacher_platform_data.json';
+
+let driveTokenClient=null;
+let driveAccessToken=localStorage.getItem('googleDriveAccessToken')||'';
+let driveTokenExpiresAt=Number(localStorage.getItem('googleDriveTokenExpiresAt')||0);
+let pendingDriveAction=null;
+let driveBusy=false;
+
+function getStudentCount(source=data){
+  return Object.values(source||{}).reduce((total,v)=>{
+    return total+(Array.isArray(v?.students)?v.students.length:0);
+  },0);
+}
+
+function updateDriveButton(){
+  const b=document.getElementById('drive-sync-btn');
+  if(b){
+    b.textContent=localStorage.getItem('teacherPlatformDriveFileId')
+      ?'☁️ Google Drive مرتبط'
+      :'☁️ ربط Google Drive';
+  }
+}
+
+window.addEventListener('load',()=>{
+  const waitForGoogle=setInterval(()=>{
+    if(window.google && google.accounts && google.accounts.oauth2){
+      clearInterval(waitForGoogle);
+
+      driveTokenClient=google.accounts.oauth2.initTokenClient({
+        client_id:GOOGLE_CLIENT_ID,
+        scope:DRIVE_SCOPE,
+        callback:handleDriveToken
+      });
+
+      updateDriveButton();
+    }
+  },300);
+});
+
+function connectGoogleDrive(){
+  pendingDriveAction='connect';
+  requestDriveToken(true);
+}
+
+function requestDriveToken(interactive=false){
+  if(!driveTokenClient){
+    alert('جارٍ تجهيز خدمة Google، حاول مرة أخرى بعد لحظات.');
+    return;
+  }
+
+  if(
+    driveAccessToken &&
+    Date.now()<driveTokenExpiresAt-30000
+  ){
+    handleDriveToken({
+      access_token:driveAccessToken,
+      expires_in:Math.max(
+        60,
+        Math.floor((driveTokenExpiresAt-Date.now())/1000)
+      )
+    });
+    return;
+  }
+
+  driveTokenClient.requestAccessToken({
+    prompt:interactive?'consent':''
+  });
+}
+
+async function handleDriveToken(r){
+
+  if(r.error){
+    console.error(r);
+    alert('حدث خطأ أثناء الاتصال بـ Google Drive.');
+    return;
+  }
+
+  driveAccessToken=r.access_token;
+
+  driveTokenExpiresAt=
+    Date.now()+((r.expires_in||3600)*1000);
+
+  localStorage.setItem(
+    'googleDriveAccessToken',
+    driveAccessToken
+  );
+
+  localStorage.setItem(
+    'googleDriveTokenExpiresAt',
+    String(driveTokenExpiresAt)
+  );
+
+  const action=pendingDriveAction||'connect';
+  pendingDriveAction=null;
+
+  try{
+
+    if(action==='connect'){
+
+      const cloud=await findDriveFile();
+
+      if(cloud){
+
+        localStorage.setItem(
+          'teacherPlatformDriveFileId',
+          cloud.id
+        );
+
+        const localCount=getStudentCount(data);
+
+        if(localCount===0){
+
+          await downloadFromGoogleDrive(false);
+
+          alert(
+            'تم ربط Google Drive وتحميل أحدث بياناتك بنجاح ☁️'
+          );
+
+        }else{
+
+          const localModified=new Date(
+            localStorage.getItem('teacherPlatformLastModified')||0
+          ).getTime();
+
+          const cloudModified=new Date(
+            cloud.modifiedTime||0
+          ).getTime();
+
+          if(cloudModified>localModified){
+
+            await downloadFromGoogleDrive(false);
+
+            alert(
+              'تم ربط Google Drive وتحميل النسخة الأحدث من السحابة ☁️'
+            );
+
+          }else{
+
+            await syncToGoogleDrive(false);
+
+            alert(
+              'تم ربط Google Drive وحفظ أحدث بياناتك بنجاح ☁️'
+            );
+          }
+        }
+
+      }else{
+
+        const localCount=getStudentCount(data);
+
+        if(localCount>0){
+
+          await syncToGoogleDrive(false);
+
+          alert(
+            'تم ربط Google Drive ورفع بياناتك الحالية بنجاح ☁️'
+          );
+
+        }else{
+
+          alert(
+            'تم الربط، ولا توجد بيانات محفوظة محليًا أو على Google Drive بعد.'
+          );
+        }
+      }
+
+      updateDriveButton();
+
+    }
+
+    else if(action==='upload'){
+
+      await syncToGoogleDrive(true);
+
+    }
+
+    else if(action==='download'){
+
+      await downloadFromGoogleDrive(true);
+
+    }
+
+  }catch(e){
+
+    console.error(e);
+
+    alert(
+      'تعذر إكمال عملية Google Drive. تأكد من اتصال الإنترنت وإعدادات Google.'
+    );
+  }
+}
+
+async function driveFetch(url,opt={}){
+
+  const headers=new Headers(opt.headers||{});
+
+  headers.set(
+    'Authorization',
+    'Bearer '+driveAccessToken
+  );
+
+  const response=await fetch(url,{
+    ...opt,
+    headers
+  });
+
+  if(!response.ok){
+    throw new Error(await response.text());
+  }
+
+  return response;
+}
+
+async function findDriveFile(){
+
+  const q=encodeURIComponent(
+    `name='${DRIVE_FILE_NAME}' and trashed=false`
+  );
+
+  const url=
+    `https://www.googleapis.com/drive/v3/files`+
+    `?q=${q}`+
+    `&spaces=drive`+
+    `&orderBy=modifiedTime desc`+
+    `&pageSize=20`+
+    `&fields=files(id,name,modifiedTime)`;
+
+  const response=await driveFetch(url);
+
+  const result=await response.json();
+
+  if(!result.files || !result.files.length){
+    return null;
+  }
+
+  result.files.sort((a,b)=>{
+    return new Date(b.modifiedTime)-new Date(a.modifiedTime);
+  });
+
+  return result.files[0];
+}
+
+function buildDrivePayload(){
+
+  return{
+    app:'منصة المعلم',
+    version:'3.0',
+    modifiedAt:
+      localStorage.getItem(
+        'teacherPlatformLastModified'
+      )||new Date().toISOString(),
+    exportedAt:new Date().toISOString(),
+    studentCount:getStudentCount(data),
+    data:data
+  };
+}
+
+async function uploadDriveFile(id){
+
+  const metadata={
+    name:DRIVE_FILE_NAME,
+    mimeType:'application/json'
+  };
+
+  const boundary=
+    'teacher_platform_'+Date.now();
+
+  const body=[
+
+    `--${boundary}\r\n`+
+    `Content-Type: application/json; charset=UTF-8\r\n\r\n`,
+
+    JSON.stringify(metadata),
+
+    `\r\n--${boundary}\r\n`+
+    `Content-Type: application/json; charset=UTF-8\r\n\r\n`,
+
+    JSON.stringify(buildDrivePayload()),
+
+    `\r\n--${boundary}--`
+
+  ].join('');
+
+  const url=id
+    ?`https://www.googleapis.com/upload/drive/v3/files/${id}?uploadType=multipart`
+    :'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart';
+
+  const response=await driveFetch(url,{
+    method:id?'PATCH':'POST',
+    headers:{
+      'Content-Type':
+        `multipart/related; boundary=${boundary}`
+    },
+    body
+  });
+
+  const result=await response.json();
+
+  localStorage.setItem(
+    'teacherPlatformDriveFileId',
+    result.id
+  );
+
+  localStorage.setItem(
+    'teacherPlatformLastSync',
+    new Date().toISOString()
+  );
+
+  return result;
+}
+
+async function syncToGoogleDrive(show=true){
+
+  if(driveBusy){
+    return;
+  }
+
+  if(
+    !driveAccessToken ||
+    Date.now()>=driveTokenExpiresAt-30000
+  ){
+    pendingDriveAction='upload';
+    requestDriveToken(false);
+    return;
+  }
+
+  driveBusy=true;
+
+  try{
+
+    const localCount=getStudentCount(data);
+
+    let id=
+      localStorage.getItem(
+        'teacherPlatformDriveFileId'
+      );
+
+    if(!id){
+
+      const cloud=await findDriveFile();
+
+      if(cloud){
+
+        id=cloud.id;
+
+        localStorage.setItem(
+          'teacherPlatformDriveFileId',
+          id
+        );
+
+      }
+    }
+
+    if(localCount===0 && id){
+
+      if(show){
+        alert(
+          'لن يتم رفع نسخة فارغة فوق بيانات Google Drive. استخدم «تحميل من Google Drive».'
+        );
+      }
+
+      return;
+    }
+
+    await uploadDriveFile(id);
+
+    refreshSyncStatus();
+
+    if(show){
+
+      alert(
+        'تم رفع أحدث البيانات إلى Google Drive بنجاح ☁️'
+      );
+    }
+
+  }finally{
+
+    driveBusy=false;
+  }
+}
+
+async function downloadFromGoogleDrive(show=true){
+
+  if(
+    !driveAccessToken ||
+    Date.now()>=driveTokenExpiresAt-30000
+  ){
+    pendingDriveAction='download';
+    requestDriveToken(false);
+    return;
+  }
+
+  const cloud=await findDriveFile();
+
+  if(!cloud){
+
+    alert(
+      'لا توجد نسخة محفوظة على Google Drive بعد.'
+    );
+
+    return;
+  }
+
+  const id=cloud.id;
+
+  const response=await driveFetch(
+    `https://www.googleapis.com/drive/v3/files/${id}?alt=media`
+  );
+
+  const payload=await response.json();
+
+  if(!payload.data){
+    throw new Error('invalid cloud data');
+  }
+
+  const cloudCount=getStudentCount(payload.data);
+
+  if(cloudCount===0){
+
+    alert(
+      'تم العثور على نسخة سحابية، لكنها لا تحتوي على طلاب.'
+    );
+
+    return;
+  }
+
+  data=payload.data;
+
+  classes.forEach(c=>{
+
+    data[c]??={
+      students:[],
+      attendance:{}
+    };
+
+    data[c].students??=[];
+    data[c].attendance??={};
+
+  });
+
+  localStorage.setItem(
+    'teacherPlatformReports',
+    JSON.stringify(data)
+  );
+
+  localStorage.setItem(
+    'teacherPlatformLastModified',
+    payload.modifiedAt||
+    cloud.modifiedTime||
+    new Date().toISOString()
+  );
+
+  localStorage.setItem(
+    'teacherPlatformDriveFileId',
+    id
+  );
+
+  localStorage.setItem(
+    'teacherPlatformLastSync',
+    new Date().toISOString()
+  );
+
+  refreshSyncStatus();
+
+  home();
+
+  if(show){
+
+    alert(
+      `تم تحميل بياناتك من Google Drive بنجاح ☁️\nعدد الطلاب المسترجعين: ${cloudCount}`
+    );
+  }
+}
+
+function manualDriveUpload(){
+
+  pendingDriveAction='upload';
+
+  requestDriveToken(false);
+}
+
+function manualDriveDownload(){
+
+  if(
+    !confirm(
+      'سيتم استبدال البيانات الموجودة على هذا الجهاز بالنسخة الأحدث المحفوظة في Google Drive. هل تريد المتابعة؟'
+    )
+  ){
+    return;
+  }
+
+  pendingDriveAction='download';
+
+  requestDriveToken(false);
+}
+    {if(!confirm('سيتم استبدال البيانات الموجودة على هذا الجهاز بالنسخة المحفوظة في Google Drive. هل تريد المتابعة؟'))return;pendingDriveAction='download';requestDriveToken(false)}
   </script>
 <header><h1>منصة المعلم</h1><div class="school">مدرسة / الراشدون الابتدائية والمتوسطة بالمربع</div><div class="teacher">الأستاذ حسن يحيى الشهري</div></header>
 <div id="mainDateTime" class="datetime-card">
@@ -516,6 +997,41 @@ function syncView(c){const connected=!!localStorage.getItem('teacherPlatformDriv
 function refreshSyncStatus(){const l=document.getElementById('lastSync');if(l)l.textContent=formatDateTime(localStorage.getItem('teacherPlatformLastSync'));const m=document.getElementById('lastModified');if(m)m.textContent=formatDateTime(localStorage.getItem('teacherPlatformLastModified'))}
 let syncTimer=null;
 function queueAutoSync(){
+
+  clearTimeout(syncTimer);
+
+  syncTimer=setTimeout(async()=>{
+
+    if(
+      !localStorage.getItem(
+        'teacherPlatformDriveFileId'
+      )
+    ){
+      return;
+    }
+
+    if(
+      !driveAccessToken ||
+      Date.now()>=driveTokenExpiresAt-30000
+    ){
+      return;
+    }
+
+    try{
+
+      await syncToGoogleDrive(false);
+
+    }catch(e){
+
+      console.error(
+        'Auto sync failed:',
+        e
+      );
+
+    }
+
+  },1500);
+}
  clearTimeout(syncTimer);
  syncTimer=setTimeout(()=>{
    // النسخة الحالية تعمل محليًا. عند ربط قاعدة البيانات السحابية
