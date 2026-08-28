@@ -1,0 +1,1389 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>منصة المعلم — التقارير</title>
+<style>
+:root{--main:#176b5b;--green:#176b5b;--bg:#f5f7f6;--line:#d8e1de;--soft:#eaf3f0}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Arial,sans-serif;color:#17332d}
+header{background:var(--main);color:#fff;padding:18px;text-align:center;position:sticky;top:0;z-index:5}.school{margin-top:5px;font-size:15px;font-weight:bold;opacity:.96}
+h1{margin:0;font-size:24px}.teacher{margin-top:5px;font-size:14px}
+main{max-width:1280px;margin:auto;padding:16px}.card{background:#fff;border-radius:14px;padding:15px;margin:10px 0;box-shadow:0 2px 8px #00000010}
+.title{font-size:20px;font-weight:bold;margin:10px 0 15px}.sub{color:#687772;font-size:13px;margin-top:5px}
+.classes{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}.class-card{cursor:pointer}.class-card:hover{outline:2px solid #b8d2ca}
+button{border:0;border-radius:9px;padding:10px 14px;background:var(--main);color:#fff;font-size:15px;cursor:pointer}
+button.secondary{background:#e7efec;color:#17332d}button.danger{background:#a93737}button.absent{background:#b84a4a}button.late{background:#b88628}
+input,select{border:1px solid var(--line);border-radius:8px;padding:9px;font-size:15px;width:100%;min-width:58px;text-align:center;background:#fff}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.toolbar input{width:auto;min-width:170px;text-align:right}
+.tabs{display:flex;gap:7px;margin:12px 0;flex-wrap:wrap}.tab{background:#e7efec;color:#17332d}.tab.active{background:var(--main);color:#fff}
+.table-wrap{overflow:auto;background:#fff;border-radius:14px;box-shadow:0 2px 8px #00000010}table{border-collapse:collapse;min-width:1180px;width:100%}
+th,td{border-bottom:1px solid var(--line);border-left:1px solid var(--line);padding:7px;text-align:center;white-space:nowrap}
+th{background:var(--soft);position:sticky;top:0;z-index:1}.name-cell{min-width:180px;text-align:right;font-weight:bold;position:sticky;right:0;background:#fff;z-index:2}th.name-cell{background:var(--soft);z-index:3}
+.total{font-weight:bold;background:#f0f6f4}.short-test{background:#fff3e0!important;border-color:#e8c98d!important}.short-head{background:#f6dfb8!important}.empty{text-align:center;padding:35px;color:#687772}
+.attendance-row{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;border-bottom:1px solid var(--line);padding:10px 0}
+.statuses{display:flex;gap:6px;flex-wrap:wrap}.status{background:#e7efec;color:#17332d;padding:8px 11px}.status.selected-present{background:var(--main);color:#fff}.status.selected-absent{background:#b84a4a;color:#fff}.status.selected-late{background:#b88628;color:#fff}
+.summary{display:flex;gap:10px;flex-wrap:wrap}.summary div{padding:10px 15px;border-radius:10px;background:#eef5f2;font-weight:bold}
+.report-choice{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}.report-choice .card{cursor:pointer;border:1px solid var(--line)}.report-choice .card:hover{outline:2px solid #b8d2ca}
+.footer{text-align:center;color:#687772;font-size:13px;margin:22px}
+.report-sheet{background:#fff;color:#111;max-width:1000px;margin:auto;padding:35px;direction:rtl}.report-head{text-align:center;border-bottom:2px solid #176b5b;padding-bottom:15px;margin-bottom:20px}.report-head h2{margin:0 0 8px}.report-table{width:100%;min-width:0}.report-table th,.report-table td{border:1px solid #555;padding:7px;position:static;background:#fff;color:#111}.report-table th{background:#eee}.signatures{display:flex;justify-content:space-between;gap:30px;margin-top:45px;text-align:center}.sig{min-width:220px}.sig-line{border-top:1px solid #444;margin-top:35px;padding-top:7px}
+@media(max-width:600px){main{padding:10px}.attendance-row{grid-template-columns:1fr}.toolbar input{width:100%}.signatures{flex-direction:column}.report-sheet{padding:18px}}
+@media print{body{background:#fff}header,main{display:none}.print-only{display:block!important}.report-sheet{box-shadow:none;padding:15px;max-width:none}.no-print{display:none!important}}
+
+/* وضع الآيفون: نفس واجهة الكمبيوتر مع الحفاظ على جميع الأقسام في الصفحة */
+@media(max-width:700px){
+  body{overflow-x:hidden}
+  main{padding:7px}
+  header{padding:12px 10px}
+  .title{font-size:18px}
+  .tabs{
+    position:sticky;top:0;z-index:15;background:var(--bg);
+    display:flex!important;flex-wrap:nowrap!important;overflow-x:auto;
+    -webkit-overflow-scrolling:touch;gap:5px;padding:7px 2px;
+  }
+  .tab{flex:0 0 auto!important;white-space:nowrap;font-size:12px;padding:9px 10px}
+  .toolbar{display:flex!important;flex-wrap:wrap;gap:6px}
+  .toolbar input{flex:1 1 100%!important;width:100%!important}
+  .toolbar button,.toolbar label{flex:1 1 calc(50% - 6px);font-size:12px;padding:9px 7px}
+  .table-wrap{
+    width:100%;overflow-x:auto!important;-webkit-overflow-scrolling:touch;
+    border:1px solid var(--line);border-radius:10px;background:#fff;
+  }
+  table{min-width:1200px!important}
+  th,td{padding:7px 5px!important;font-size:12px}
+  input[type=number]{min-width:52px!important;width:58px!important;font-size:16px!important;min-height:42px}
+  .name-cell{position:sticky!important;right:0!important;z-index:3;background:#fff;min-width:145px!important;box-shadow:-3px 0 5px #00000012}
+  thead .name-cell{z-index:5}
+  .summary{grid-template-columns:1fr 1fr!important}
+  .summary div{font-size:12px;padding:9px}
+  .card{padding:10px;margin:8px 0}
+  .classes{grid-template-columns:1fr 1fr!important}
+  .class-card{min-height:85px}
+  .attendance-row{grid-template-columns:1fr!important}
+  .statuses{grid-template-columns:repeat(3,1fr)!important}
+  button{min-height:40px}
+}
+
+
+/* تحسينات اللمس مع الحفاظ على واجهة الكمبيوتر */
+@media(max-width:700px){
+  .table-wrap{scroll-snap-type:x proximity}
+  .table-wrap td,.table-wrap th{scroll-snap-align:start}
+  input[type=number]{-webkit-appearance:none;appearance:none}
+  .desktop-nav{display:flex!important;overflow-x:auto;gap:6px;position:sticky;bottom:0;z-index:30;background:#ffffffee;backdrop-filter:blur(10px);padding:8px;border-top:1px solid var(--line);margin:14px -7px -7px}
+  .desktop-nav button{flex:0 0 auto;font-size:12px;min-height:42px;padding:9px 11px}
+}
+@media(min-width:701px){.desktop-nav{display:none!important}}
+
+
+/* لوحة ملخص الصف */
+.class-dashboard{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:12px 0}
+.metric{background:#fff;border:1px solid var(--line);border-radius:11px;padding:11px;text-align:center}
+.metric .n{font-size:22px;font-weight:bold;color:var(--green);margin-top:5px}
+@media(max-width:700px){.class-dashboard{grid-template-columns:1fr 1fr}.metric{padding:9px;font-size:12px}.metric .n{font-size:20px}}
+
+
+/* تمييز صفوف جدول الطلاب بالتناوب لتسهيل القراءة */
+.table-wrap tbody tr:nth-child(odd) td{background:#ffffff}
+.table-wrap tbody tr:nth-child(even) td{background:#f1f3f2}
+.table-wrap tbody tr:nth-child(odd) .name-cell{background:#ffffff}
+.table-wrap tbody tr:nth-child(even) .name-cell{background:#f1f3f2}
+.table-wrap tbody tr:hover td{background:#e5f0ec!important}
+@media(max-width:700px){
+ .table-wrap tbody tr:nth-child(odd) .name-cell{background:#ffffff!important}
+ .table-wrap tbody tr:nth-child(even) .name-cell{background:#f1f3f2!important}
+}
+
+
+.serial-cell{font-weight:700;text-align:center;min-width:48px}
+@media(max-width:700px){
+  .serial-cell{position:sticky;right:0;z-index:4;box-shadow:-2px 0 4px #00000012}
+  .name-cell{right:48px!important}
+  thead .serial-cell{z-index:6}
+  .table-wrap tbody tr:nth-child(odd) .serial-cell{background:#ffffff!important}
+  .table-wrap tbody tr:nth-child(even) .serial-cell{background:#f1f3f2!important}
+}
+
+
+/* تصغير عمود الرقم التسلسلي */
+th.serial-cell,td.serial-cell{
+  width:32px!important;
+  min-width:32px!important;
+  max-width:32px!important;
+  padding-right:3px!important;
+  padding-left:3px!important;
+}
+@media(max-width:700px){
+  .serial-cell{width:30px!important;min-width:30px!important;max-width:30px!important}
+  .name-cell{right:30px!important}
+}
+
+
+/* تحسين تتبع الصف أثناء إدخال الدرجات */
+.table-wrap tbody tr:focus-within td{
+  background:#e3f0eb!important;
+  box-shadow:inset 0 1px 0 #b9d8cd,inset 0 -1px 0 #b9d8cd;
+}
+.table-wrap tbody tr:focus-within .serial-cell,
+.table-wrap tbody tr:focus-within .name-cell{background:#d7ebe3!important}
+.student-count-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:10px;background:#edf5f2;border:1px solid var(--line);
+  border-radius:10px;padding:9px 12px;margin:9px 0;font-size:13px
+}
+.student-count-bar b{font-size:18px;color:var(--green)}
+@media(max-width:700px){
+ .student-count-bar{font-size:12px}
+ .student-count-bar b{font-size:17px}
+}
+
+
+/* مجاميع تلقائية إضافية */
+.short-total{font-weight:800;background:#f8ead1!important}
+.grand-total{font-weight:900;font-size:16px;background:#dceee8!important;color:#0f5548}
+.short-head{white-space:nowrap}
+.grand-head{background:#cfe5dc!important;color:#0f5548}
+
+
+/* بطاقة التاريخ والوقت في الواجهة الرئيسية */
+.datetime-card{
+  margin:12px auto 18px;
+  max-width:760px;
+  padding:16px 18px;
+  background:linear-gradient(135deg,#176b5b,#23806d);
+  color:#fff;
+  border-radius:16px;
+  box-shadow:0 8px 22px rgba(23,107,91,.18);
+  text-align:center;
+}
+.datetime-day{font-size:20px;font-weight:800;margin-bottom:8px}
+.datetime-dates{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+.datetime-item{background:rgba(255,255,255,.14);padding:8px 14px;border-radius:10px}
+.datetime-label{font-size:11px;opacity:.82;display:block;margin-bottom:3px}
+.datetime-value{font-weight:700}
+.datetime-time{font-size:26px;font-weight:800;margin-top:12px;letter-spacing:.5px;direction:ltr}
+
+
+/* التقارير */
+.report-sheet{background:#fff;max-width:980px;margin:15px auto;padding:18px;border-radius:14px;box-shadow:0 4px 18px #00000012;color:#111}
+.report-actions{display:flex;gap:10px;justify-content:center;margin-bottom:15px}
+.report-head{text-align:center;border-bottom:2px solid var(--main);padding-bottom:14px;margin-bottom:16px}
+.report-head h2{margin:0 0 6px}.report-sheet .school{font-size:16px;font-weight:700;margin:5px 0}
+.report-sheet .printed{font-size:12px;color:#555;margin-top:8px}
+.report-table-wrap{width:100%;overflow:hidden}
+.report-sheet table{border-collapse:collapse;width:100%;table-layout:fixed;font-size:11px}
+.report-sheet th,.report-sheet td{border:1px solid #555;padding:5px 2px;text-align:center;color:#111;word-break:break-word;overflow-wrap:anywhere;vertical-align:middle}
+.report-sheet th{background:#eee;white-space:normal}
+.report-sheet th:first-child,.report-sheet td:first-child{width:4%}
+.report-sheet th:nth-child(2),.report-sheet td:nth-child(2){width:22%;text-align:right;padding-right:5px}
+.report-sheet .sign{display:flex;justify-content:space-between;gap:30px;margin-top:45px;text-align:center}
+.report-sheet .sig{flex:1}.report-sheet .line{border-top:1px solid #333;margin-top:35px;padding-top:7px}
+@media(max-width:700px){
+ .report-sheet{padding:8px;margin:5px auto}
+ .report-actions button{flex:1;font-size:13px}
+ .report-sheet table{font-size:8.5px}
+ .report-sheet th,.report-sheet td{padding:3px 1px}
+ .report-sheet th:nth-child(2),.report-sheet td:nth-child(2){width:20%}
+ .report-head h2{font-size:20px}
+ .report-sheet .school{font-size:13px}
+}
+@media print{
+ @page{size:auto;margin:10mm}
+ body{background:#fff!important}
+ body:not(.printing-report) .report-sheet{display:none!important}
+ header,main>.tabs,.no-print{display:none!important}
+ main{padding:0!important}
+ .report-sheet{box-shadow:none!important;margin:0!important;padding:0!important;max-width:none!important;width:100%!important}
+ .report-table-wrap{overflow:visible!important;width:100%!important}
+ .report-sheet table{width:100%!important;min-width:0!important;table-layout:fixed!important;font-size:9px!important}
+ .report-sheet th,.report-sheet td{padding:3px 1px!important}
+ thead{display:table-header-group}
+ tr{page-break-inside:avoid}
+}
+
+
+.report-main-btn{width:100%;font-size:17px;padding:16px;margin-top:8px}
+
+.report-card-btn{display:block;width:100%;text-align:right;background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;color:inherit;cursor:pointer;font:inherit}
+.report-card-btn:hover{border-color:var(--main)}
+.report-card-btn h3{margin:0 0 6px}
+
+</style>
+</head>
+<body>
+  <div style="text-align:center;margin:15px 0;"><button id="drive-sync-btn" onclick="connectGoogleDrive()">☁️ ربط Google Drive</button></div>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script>
+  const GOOGLE_CLIENT_ID='181382887608-99h18jllkhmkasa5g6n6i4c8idrjn4aq.apps.googleusercontent.com';
+  const DRIVE_SCOPE='https://www.googleapis.com/auth/drive.file';
+  const DRIVE_FILE_NAME='teacher_platform_data.json';
+  let driveTokenClient=null,driveAccessToken=localStorage.getItem('googleDriveAccessToken')||'',driveTokenExpiresAt=Number(localStorage.getItem('googleDriveTokenExpiresAt')||0),pendingDriveAction=null;
+  function updateDriveButton(){const b=document.getElementById('drive-sync-btn');if(b)b.textContent=localStorage.getItem('teacherPlatformDriveFileId')?'☁️ Google Drive مرتبط':'☁️ ربط Google Drive'}
+  window.addEventListener('load',()=>{if(!window.google||!google.accounts||!google.accounts.oauth2){setTimeout(updateDriveButton,800);return}driveTokenClient=google.accounts.oauth2.initTokenClient({client_id:GOOGLE_CLIENT_ID,scope:DRIVE_SCOPE,callback:handleDriveToken});updateDriveButton()});
+  function connectGoogleDrive(){pendingDriveAction='connect';requestDriveToken(true)}
+  function requestDriveToken(interactive=false){
+  if(!driveTokenClient){
+    if(window.google&&google.accounts&&google.accounts.oauth2){
+      driveTokenClient=google.accounts.oauth2.initTokenClient({client_id:GOOGLE_CLIENT_ID,scope:DRIVE_SCOPE,callback:handleDriveToken});
+    }else{
+      alert('جارٍ تجهيز خدمة Google، انتظر لحظة ثم أعد المحاولة.');
+      return;
+    }
+  }
+  if(driveAccessToken&&Date.now()<driveTokenExpiresAt-30000){
+    handleDriveToken({access_token:driveAccessToken,expires_in:Math.max(60,Math.floor((driveTokenExpiresAt-Date.now())/1000))});
+    return;
+  }
+  driveTokenClient.requestAccessToken({prompt:interactive?'consent':''});
+}
+  async function handleDriveToken(r){if(r.error){console.error(r);alert('حدث خطأ أثناء الاتصال بـ Google Drive.');return}driveAccessToken=r.access_token;driveTokenExpiresAt=Date.now()+((r.expires_in||3600)*1000);localStorage.setItem('googleDriveAccessToken',driveAccessToken);localStorage.setItem('googleDriveTokenExpiresAt',String(driveTokenExpiresAt));const a=pendingDriveAction||'connect';pendingDriveAction=null;try{if(a==='connect'){const cloud=await findDriveFile();if(cloud){localStorage.setItem('teacherPlatformDriveFileId',cloud.id);const hasLocal=Object.values(data||{}).some(v=>v&&Array.isArray(v.students)&&v.students.length);if(!hasLocal)await downloadFromGoogleDrive(false);else await syncToGoogleDrive(false)}else await syncToGoogleDrive(false);updateDriveButton();alert('تم ربط Google Drive بنجاح ✅')}else if(a==='upload')await syncToGoogleDrive(false);else if(a==='download')await downloadFromGoogleDrive(true)}catch(e){console.error(e);alert('تعذر إكمال عملية Google Drive. تأكد من اتصال الإنترنت وإعدادات OAuth.')}}
+  async function driveFetch(url,opt={}){const h=new Headers(opt.headers||{});h.set('Authorization','Bearer '+driveAccessToken);const r=await fetch(url,{...opt,headers:h});if(!r.ok)throw new Error(await r.text());return r}
+  async function findDriveFile(){const q=encodeURIComponent(`name='${DRIVE_FILE_NAME}' and trashed=false`);const r=await driveFetch(`https://www.googleapis.com/drive/v3/files?q=${q}&spaces=drive&fields=files(id,name,modifiedTime)`);const j=await r.json();return j.files&&j.files[0]||null}
+  function buildDrivePayload(){return{app:'منصة المعلم',version:'2.0',modifiedAt:localStorage.getItem('teacherPlatformLastModified')||new Date().toISOString(),exportedAt:new Date().toISOString(),data:data}}
+  async function uploadDriveFile(id){const meta={name:DRIVE_FILE_NAME,mimeType:'application/json'},b='teacher_platform_'+Date.now(),body=[`--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n`,JSON.stringify(meta),`\r\n--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n`,JSON.stringify(buildDrivePayload()),`\r\n--${b}--`].join('');const url=id?`https://www.googleapis.com/upload/drive/v3/files/${id}?uploadType=multipart`:'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart';const r=await driveFetch(url,{method:id?'PATCH':'POST',headers:{'Content-Type':`multipart/related; boundary=${b}`},body});const j=await r.json();localStorage.setItem('teacherPlatformDriveFileId',j.id);localStorage.setItem('teacherPlatformLastSync',new Date().toISOString());return j}
+  async function syncToGoogleDrive(show=true){
+  if(!driveAccessToken||Date.now()>=driveTokenExpiresAt-30000){
+    pendingDriveAction='upload';
+    requestDriveToken(false);
+    return;
+  }
+  let id=localStorage.getItem('teacherPlatformDriveFileId');
+  if(!id){const f=await findDriveFile();id=f&&f.id||''}
+  await uploadDriveFile(id);
+  if(show)alert('تم رفع أحدث البيانات إلى Google Drive بنجاح ☁️');
+  refreshSyncStatus();
+}
+  async function downloadFromGoogleDrive(show=true){if(!driveAccessToken||Date.now()>=driveTokenExpiresAt-30000){pendingDriveAction='download';requestDriveToken(false);return}let id=localStorage.getItem('teacherPlatformDriveFileId');if(!id){const f=await findDriveFile();id=f&&f.id}if(!id){alert('لا توجد نسخة محفوظة على Google Drive بعد.');return}const r=await driveFetch(`https://www.googleapis.com/drive/v3/files/${id}?alt=media`),p=await r.json();if(!p.data)throw new Error('invalid cloud data');
+const cloudHasCurrentClasses=classes.some(c=>p.data[c]&&Array.isArray(p.data[c].students)&&p.data[c].students.length>0);
+if(!cloudHasCurrentClasses){alert('تم العثور على نسخة سحابية قديمة تحتوي على بيانات الصفوف السابقة أو التجريبية. تم الحفاظ على قوائم الطلاب الجديدة الموجودة في البرنامج. اضغط «رفع الآن» لحفظ القوائم الجديدة في Google Drive.');return;}
+data=p.data;classes.forEach(c=>{data[c]??={students:[],attendance:{}};data[c].students??=[];data[c].attendance??={};});localStorage.setItem('teacherPlatformReports',JSON.stringify(data));localStorage.setItem('teacherPlatformLastModified',p.modifiedAt||new Date().toISOString());localStorage.setItem('teacherPlatformDriveFileId',id);localStorage.setItem('teacherPlatformLastSync',new Date().toISOString());if(show)alert('تم تحميل بياناتك من Google Drive بنجاح ☁️');refreshSyncStatus();home()}
+  function manualDriveUpload(){pendingDriveAction='upload';requestDriveToken(false)}
+  function manualDriveDownload(){if(!confirm('سيتم استبدال البيانات الموجودة على هذا الجهاز بالنسخة المحفوظة في Google Drive. هل تريد المتابعة؟'))return;pendingDriveAction='download';requestDriveToken(false)}
+  </script>
+<header><h1>منصة المعلم</h1><div class="school">مدرسة / الراشدون الابتدائية والمتوسطة بالمربع</div><div class="teacher">الأستاذ حسن يحيى الشهري</div></header>
+<div id="mainDateTime" class="datetime-card">
+  <div id="weekday" class="datetime-day">—</div>
+  <div class="datetime-dates">
+    <div class="datetime-item"><span class="datetime-label">التاريخ الهجري</span><span id="hijriDate" class="datetime-value">—</span></div>
+    <div class="datetime-item"><span class="datetime-label">التاريخ الميلادي</span><span id="gregorianDate" class="datetime-value">—</span></div>
+  </div>
+  <div id="currentTime" class="datetime-time">—</div>
+</div>
+<main id="app"></main>
+<script>
+const classes=['الصف السادس الابتدائي أ','الصف السادس الابتدائي ب','الصف الأول المتوسط أ'];
+const STUDENT_MIGRATION_VERSION='2026-08-27-real-students-v1';
+const initialStudents={
+ 'الصف السادس الابتدائي أ':[
+  'أحمد محمد بن حسن الشهري','إبراهيم أحمد حسن عسيري','أحمد عبدالله علي عسيري','حسن بن عوض بن حسن آل مانع الشهري','حسن محمد حسن عسيري','رائد علي مسفر الهلالي','راكان علي عوض المشكحة الشهري','سلطان عامر موسى عسيري','عبدالله علي جابر العسيري','عبدالرحمن أحمد إبراهيم عسيري','علي أحمد علي عسيري','علي بن حسن بن يحيى بن جابر آل بكري','علي جابر علي عسيري','علي زايد محمد عسيري','علي سالم جابر العسيري','علي عمر علي عسيري','علي هزاع أحمد الشهري','عمر إبراهيم علي الأحمري','عمر محمد أحمد عسيري','محمد إبراهيم عبدالله عسيري','محمد عامر محمد عسيري','محمد علي محمد عسيري','محمد موسى عامر عسيري','محمد هزاع محمد الشهري','مسعود عمر أحمد عسيري','مشعل علي محمد الشهري','معدي أحمد حسن عسيري','موسى علي موسى عسيري','موسى عمر حسن عسيري','نايف أحمد قناي عسيري'
+ ],
+ 'الصف السادس الابتدائي ب':[
+  'أحمد علي معدي عسيري','أحمد حسن أحمد الشهري','أحمد علي مفرح عسيري','أحمد عمر أحمد الشهري','البراء بن علي بن نايف عسيري','بدر حسن بن علي الغامدي','حسن زاهر حسن عسيري','حسن سليمان حسن عسيري','زايد محمد إبراهيم عسيري','عبدالله أحمد علي عسيري','علي أحمد أحمد عسيري','علي حسن علي حسن الشهري','علي حسن علي محمد الشهري','علي حسن علي هزاع الشهري','علي سعيد محمد آل حسنه','علي موسى معدي عسيري','علي هزاع علي الشهري','عماد عادل معدي الشهري','عمر جابر سالم عسيري','عوض علي عوض محمد الشهري','مازن حسن محمد الشهري','محمد إبراهيم محمد عسيري','محمد أحمد محمد الشهري','محمد بن أحمد بن محمد بن أحمد آل المشكحة الشهري','محمد بن سلطان بن محمد بن عامر المفضمي','محمد زايد علي الصوقعي','محمد صالح علي الشهري','محمد علي موسى عسيري','مناف أحمد عامر الشهري','يحيى محمد بن علي الشهري'
+ ],
+ 'الصف الأول المتوسط أ':[
+  'أحمد بسام أحمد عسيري','إياد عامر محمد الشهري','جابر عبدالله جابر العسيري','جابر عبده محمد آل حسنه','حزام حسن يحيى الشهري','حسن أحمد حسن العسيري','حسن بن فيصل بن حسن عسيري','رائد فواز هادي الشهري','رامي جابر علي عسيري','سالم أحمد سالم عسيري','طلال علي حمد عسيري','عبدالرحمن إبراهيم محمد عسيري','عبدالرحمن حسن هادي الشهري','عبدالرحمن علي غازي عسيري','عبدالملك محمد حسن الشهري','عزام محمد جابر المعربي','علي أبو طالب جابر عسيري','علي سالم أحمد عسيري','مؤيد علي جابر عسيري','محمد أحمد محمد عسيري','محمد بن علي بن محمد الشهري','مراد جابر شيلي عسيري','مشاري أحمد جابر عسيري','وليد هادي محمد الشهري','يوسف محمد قليل الشهري'
+ ]
+};
+function createStudent(name){return {name,abs:0,late:0,mem:[null,null,null,null,null,null],short:[null,null,null,null],t1:null,t2:null,privateNote:'',behaviors:{late:[],disruptive:[],talking:[],inattentive:[],noBook:[],noMushaf:[],notWriting:[]}}}
+let data=JSON.parse(localStorage.getItem('teacherPlatformReports')||'{}');
+if(localStorage.getItem('teacherPlatformStudentMigration')!==STUDENT_MIGRATION_VERSION){
+  data={};
+  classes.forEach(c=>{data[c]={students:initialStudents[c].map(createStudent),attendance:{}}});
+  localStorage.setItem('teacherPlatformReports',JSON.stringify(data));
+  localStorage.setItem('teacherPlatformLastModified',new Date().toISOString());
+  localStorage.setItem('teacherPlatformStudentMigration',STUDENT_MIGRATION_VERSION);
+}else{
+  classes.forEach(c=>{data[c]??={students:[],attendance:{}};data[c].students??=[];data[c].attendance??={};});
+}
+const save=()=>{
+ const now=new Date().toISOString();
+ localStorage.setItem('teacherPlatformReports',JSON.stringify(data));
+ localStorage.setItem('teacherPlatformLastModified',now);
+ if(autoSyncEnabled) queueAutoSync();
+};
+const app=document.getElementById('app');
+const today=()=>new Date().toISOString().slice(0,10);
+let currentTab='grades';
+let autoSyncEnabled=localStorage.getItem('teacherPlatformAutoSync')==='true';
+
+function home(){updateDriveButton();app.innerHTML=`<div class="title">صفوفي الدراسية</div><div class="classes">${classes.map(c=>`<div class="card class-card" onclick="openClass('${c}')"><b>${c}</b><div class="sub">${data[c].students.length} طالب</div></div>`).join('')}</div><div class="footer">نسخة تجريبية — الدرجات والحضور والتقارير</div>`}
+
+function openClass(c){
+ app.innerHTML=`<button class="secondary" onclick="home()">← الصفوف</button><div class="title">${c}</div>
+<div class="desktop-nav">
+ <button class="secondary" onclick="switchTab('${c}','grades')">📊 الدرجات</button>
+ <button class="secondary" onclick="switchTab('${c}','attendance')">📅 الحضور</button>
+ <button class="secondary" onclick="switchTab('${c}','reports')">📄 التقارير</button>
+ <button class="secondary" onclick="switchTab('${c}','stats')">📈 الإحصاءات</button>
+ <button class="secondary" onclick="switchTab('${c}','sync')">☁️ المزامنة</button>
+ <button class="secondary" onclick="switchTab('${c}','settings')">⚙️ الإعدادات</button>
+</div>
+ <div class="tabs"><button class="tab ${currentTab==='grades'?'active':''}" onclick="switchTab('${c}','grades')">📊 الدرجات</button>
+ <button class="tab ${currentTab==='attendance'?'active':''}" onclick="switchTab('${c}','attendance')">📅 الحضور</button>
+ <button class="tab ${currentTab==='reports'?'active':''}" onclick="switchTab('${c}','reports')">📄 التقارير</button>
+ <button class="tab ${currentTab==='sync'?'active':''}" onclick="switchTab('${c}','sync')">☁️ النسخ والمزامنة</button>
+ <button class="tab ${currentTab==='stats'?'active':''}" onclick="switchTab('${c}','stats')">📈 الإحصاءات</button>
+ <button class="tab ${currentTab==='settings'?'active':''}" onclick="switchTab('${c}','settings')">⚙️ الإعدادات</button></div><div id="content"></div>`;renderContent(c);
+}
+function switchTab(c,t){currentTab=t;openClass(c)}
+function renderContent(c){
+ const view=currentTab==='grades'?gradesView(c):currentTab==='attendance'?attendanceView(c):currentTab==='reports'?reportsView(c):currentTab==='sync'?syncView(c):currentTab==='stats'?statsView(c):settingsView(c);
+ document.getElementById('content').innerHTML=view;
+ if(currentTab==='sync') startUsageTimer();
+}
+
+function gradesView(c){
+ const students=data[c].students;
+ return `<div class="toolbar card">
+ <input id="studentName" placeholder="اسم الطالب">
+ <button onclick="addStudent('${c}')">＋ إضافة طالب</button>
+ <input id="studentSearch" placeholder="🔎 البحث عن طالب" oninput="filterStudents('${c}',this.value)">
+ <button class="secondary" onclick="resetStudentGrades('${c}')">🧹 مسح درجات طالب</button>
+ <button class="secondary" onclick="resetAllGrades('${c}')">🧹 مسح درجات جميع الطلاب</button>
+ </div>
+ <div class="notice">📱 نفس ترتيب وتجربة الكمبيوتر. اسحب الجدول أفقيًا للوصول إلى جميع الخانات، وسيبقى اسم الطالب ظاهرًا أثناء إدخال الدرجات. يمكنك لمس أي خانة رقمية مباشرة ثم الانتقال للخانة التالية.</div>
+<div class="student-count-bar"><span>👨‍🎓 عدد الطلاب المسجلين في هذا الصف</span><b>${students.length} طالب</b></div>
+<div class="table-wrap">${renderTable(c,students)}</div><div class="card" style="padding:9px;margin-top:9px"><div class="toolbar">
+ <button class="secondary" onclick="window.scrollTo({top:0,behavior:'smooth'})">⬆️ أعلى الصفحة</button>
+ <button class="secondary" onclick="document.querySelector('.table-wrap')?.scrollTo({left:document.querySelector('.table-wrap').scrollWidth,behavior:'smooth'})">↔️ نهاية الجدول</button>
+ <button class="secondary" onclick="document.querySelector('.table-wrap')?.scrollTo({left:0,behavior:'smooth'})">↔️ بداية الجدول</button>
+</div></div><div class="footer">اسحب أفقيًا لرؤية جميع الخانات</div>`;
+}
+function renderTable(c,students){
+ if(!students.length)return '<div class="empty">لا يوجد طلاب بعد — أضف أول طالب من الأعلى.</div>';
+ return `<table><thead><tr><th class="serial-cell">م</th><th class="name-cell">اسم الطالب</th><th>غياب</th>${[1,2,3,4,5,6].map(x=>`<th>حفظ ${x}</th>`).join('')}<th>المجموع /60</th>${[1,2,3,4].map(x=>`<th class="short-head">اختبار قصير ${x} /10</th>`).join('')}<th class="short-head">مجموع القصيرة /40</th><th>اختبار 1 /100</th><th>اختبار 2 /100</th><th class="grand-head">المجموع الكلي /300</th><th>حذف</th></tr></thead><tbody>${students.map((s,i)=>{s.mem??=[null,null,null,null,null,null];s.short??=[null,null,null,null];let total=s.mem.reduce((a,b)=>a+(Number(b)||0),0);let shortTotal=s.short.reduce((a,b)=>a+(Number(b)||0),0);let grandTotal=total+shortTotal+(Number(s.t1)||0)+(Number(s.t2)||0);return `<tr><td class="serial-cell">${i+1}</td><td class="name-cell">${s.name}</td><td>${s.abs||0}</td>${s.mem.map((v,x)=>`<td><input type="number" min="0" max="10" value="${v??''}" onchange="setMem('${c}',${i},${x},this.value)"></td>`).join('')}<td class="total">${total}</td>${s.short.map((v,x)=>`<td><input class="short-test" type="number" min="0" max="10" value="${v??''}" onchange="setShort('${c}',${i},${x},this.value)"></td>`).join('')}<td class="short-total">${shortTotal}</td><td><input type="number" min="0" max="100" value="${s.t1??''}" onchange="setField('${c}',${i},'t1',this.value)"></td><td><input type="number" min="0" max="100" value="${s.t2??''}" onchange="setField('${c}',${i},'t2',this.value)"></td><td class="grand-total">${grandTotal}</td><td><button class="danger" onclick="removeStudent('${c}',${i})">حذف</button></td></tr>`}).join('')}</tbody></table>`;
+}
+function addStudent(c){let n=document.getElementById('studentName').value.trim();if(!n)return;data[c].students.push({name:n,abs:0,late:0,mem:[null,null,null,null,null,null],short:[null,null,null,null],t1:null,t2:null});save();renderContent(c)}
+function filterStudents(c,q){
+ const term=q.trim();
+ const rows=document.querySelectorAll('.table-wrap tbody tr');
+ rows.forEach(row=>row.style.display=term===''||row.querySelector('.name-cell').textContent.includes(term)?'':'none');
+}
+function setMem(c,i,x,v){data[c].students[i].mem[x]=v===''?null:Math.max(0,Math.min(10,Number(v)));save();renderContent(c)}
+function setShort(c,i,x,v){data[c].students[i].short??=[null,null,null,null];data[c].students[i].short[x]=v===''?null:Math.max(0,Math.min(10,Number(v)));save()}
+function setField(c,i,k,v){data[c].students[i][k]=v===''?null:Math.max(0,Math.min(100,Number(v)));save()}
+function removeStudent(c,i){
+ const s=data[c].students[i];
+ if(confirm(`هل تريد حذف الطالب "${s.name}" نهائيًا؟`)){
+   data[c].students.splice(i,1);
+   // إعادة فهرسة سجلات الحضور حتى تبقى مرتبطة بالطلاب الصحيحين
+   Object.keys(data[c].attendance).forEach(date=>{
+     const old=data[c].attendance[date]||{};
+     const updated={};
+     Object.keys(old).forEach(key=>{
+       const n=Number(key);
+       if(n<i) updated[n]=old[key];
+       else if(n>i) updated[n-1]=old[key];
+     });
+     data[c].attendance[date]=updated;
+   });
+   recalc(c);
+   save();
+   renderContent(c);
+ }
+}
+function resetGradesObject(s){
+ s.mem=[null,null,null,null,null,null];
+ s.short=[null,null,null,null];
+ s.t1=null;
+ s.t2=null;
+}
+function resetStudentGrades(c){
+ const students=data[c].students;
+ if(!students.length){alert('لا يوجد طلاب في هذا الصف.');return;}
+ const list=students.map((s,i)=>`${i+1}. ${s.name}`).join('\n');
+ const answer=prompt('اكتب رقم الطالب الذي تريد مسح درجاته فقط:\n\n'+list);
+ if(answer===null)return;
+ const n=Number(answer)-1;
+ if(!Number.isInteger(n)||n<0||n>=students.length){alert('رقم الطالب غير صحيح.');return;}
+ const s=students[n];
+ if(confirm(`هل تريد مسح درجات الطالب "${s.name}"؟\nسيتم مسح درجات الحفظ والاختبارين فقط، ولن يتأثر الغياب أو التأخر.`)){
+   resetGradesObject(s);
+   save();
+   renderContent(c);
+ }
+}
+function resetAllGrades(c){
+ const students=data[c].students;
+ if(!students.length){alert('لا يوجد طلاب في هذا الصف.');return;}
+ if(confirm(`هل أنت متأكد من مسح درجات جميع طلاب ${c}؟\nسيتم مسح درجات الحفظ والاختبار الأول والثاني فقط.\nلن يتأثر الغياب أو التأخر.`)){
+   students.forEach(resetGradesObject);
+   save();
+   renderContent(c);
+ }
+}
+
+function attendanceView(c){
+ let d=today();return attendanceForDate(c,d);
+}
+function attendanceForDate(c,d){
+ const students=data[c].students,records=data[c].attendance[d]||{};
+ return `<div class="card toolbar"><b>تاريخ الحضور</b><input type="date" value="${d}" onchange="showAttendanceDate('${c}',this.value)"><button onclick="markAll('${c}','present','${d}')">تسجيل الجميع حاضر</button><button class="secondary" onclick="clearAllPresent('${c}','${d}')">تفريغ الحضور للجميع</button></div>
+ <div class="card"><div class="summary">${attendanceSummary(c,d)}</div></div>
+ <div class="card">${students.length?students.map((s,i)=>{let st=records[i]==='absent'?'absent':'present';return `<div class="attendance-row"><b>${s.name}</b><div class="statuses"><button class="status ${st==='present'?'selected-present':''}" onclick="setAttendance('${c}','${d}',${i},'present')">حاضر ✓</button><button class="status ${st==='absent'?'selected-absent':''}" onclick="setAttendance('${c}','${d}',${i},'absent')">غائب ✕</button></div></div>`}).join(''):'<div class="empty">أضف الطلاب أولًا من تبويب الدرجات.</div>'}</div>`;
+}
+function showAttendanceDate(c,d){document.getElementById('content').innerHTML=attendanceForDate(c,d)}
+function attendanceSummary(c,d){let r=data[c].attendance[d]||{},a=0,p=0;data[c].students.forEach((_,i)=>{let s=r[i]==='absent'?'absent':'present';if(s==='absent')a++;else p++;});return `<div>حاضر: ${p}</div><div>غائب: ${a}</div>`}
+function recalc(c){data[c].students.forEach((s,i)=>{s.abs=0;Object.values(data[c].attendance).forEach(day=>{if(day[i]==='absent')s.abs++;})})}
+function setAttendance(c,d,i,status){if(status!=='absent')status='present';data[c].attendance[d]??={};data[c].attendance[d][i]=status;recalc(c);save();showAttendanceDate(c,d)}
+function markAll(c,status,d){data[c].attendance[d]??={};data[c].students.forEach((_,i)=>data[c].attendance[d][i]='present');recalc(c);save();showAttendanceDate(c,d)}
+function clearAllPresent(c,d){
+  const records=data[c].attendance[d];
+  if(!records){showAttendanceDate(c,d);return;}
+  Object.keys(records).forEach(i=>{if(records[i]==='present')delete records[i];});
+  if(Object.keys(records).length===0)delete data[c].attendance[d];
+  recalc(c);save();showAttendanceDate(c,d);
+}
+
+
+
+function getUsageSeconds(){
+ const total=Number(localStorage.getItem('teacherPlatformUsageSeconds')||0);
+ const sessionStart=Number(sessionStorage.getItem('teacherPlatformSessionStart')||Date.now());
+ return total+Math.floor((Date.now()-sessionStart)/1000);
+}
+function formatDuration(total){
+ total=Math.max(0,Math.floor(total));
+ const days=Math.floor(total/86400); total%=86400;
+ const hours=Math.floor(total/3600); total%=3600;
+ const minutes=Math.floor(total/60); const seconds=total%60;
+ return `${String(days).padStart(2,'0')} يوم : ${String(hours).padStart(2,'0')} ساعة : ${String(minutes).padStart(2,'0')} دقيقة : ${String(seconds).padStart(2,'0')} ثانية`;
+}
+function formatDateTime(iso){
+ if(!iso)return 'لا توجد تعديلات مسجلة بعد';
+ const d=new Date(iso);
+ return d.toLocaleString('ar-SA',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+if(!sessionStorage.getItem('teacherPlatformSessionStart')){
+ sessionStorage.setItem('teacherPlatformSessionStart',Date.now());
+}
+function persistUsage(){
+ const start=Number(sessionStorage.getItem('teacherPlatformSessionStart')||Date.now());
+ const elapsed=Math.floor((Date.now()-start)/1000);
+ const total=Number(localStorage.getItem('teacherPlatformUsageSeconds')||0)+elapsed;
+ localStorage.setItem('teacherPlatformUsageSeconds',total);
+ sessionStorage.setItem('teacherPlatformSessionStart',Date.now());
+}
+window.addEventListener('pagehide',persistUsage);
+setInterval(persistUsage,30000);
+
+
+
+function settingsView(c){
+ const students=data[c].students;
+ return `<div class="card">
+ <div class="title">⚙️ إدارة الطلاب</div>
+ <div class="toolbar">
+   <button class="secondary" onclick="renameStudent('${c}')">✏️ تعديل اسم طالب</button>
+   <button class="secondary" onclick="sortStudents('${c}')">🔤 ترتيب الطلاب أبجديًا</button>
+ </div>
+ <div class="sub">يمكنك تعديل اسم أي طالب دون فقدان درجاته أو سجل حضوره.</div>
+ </div>
+ <div class="card">
+ <div class="title">📋 إدارة بيانات الصف</div>
+ <div class="toolbar">
+   <button class="secondary" onclick="clearAttendance('${c}')">🗓️ مسح سجل الحضور</button>
+   <button class="danger" onclick="deleteAllStudents('${c}')">🗑️ حذف جميع الطلاب</button>
+ </div>
+ <div class="sub">مسح سجل الحضور لا يحذف الطلاب أو درجاتهم. أما حذف جميع الطلاب فهو إجراء نهائي بعد التأكيد.</div>
+ </div>
+ <div class="card">
+ <div class="title">📊 حالة الصف</div>
+ <div class="summary">
+   <div>عدد الطلاب: ${students.length}</div>
+   <div>أيام الحضور المسجلة: ${Object.keys(data[c].attendance).length}</div>
+   <div>آخر تعديل: ${formatDateTime(localStorage.getItem('teacherPlatformLastModified'))}</div>
+ </div>
+ </div>`;
+}
+function renameStudent(c){
+ const students=data[c].students;
+ if(!students.length){alert('لا يوجد طلاب.');return;}
+ const list=students.map((s,i)=>`${i+1}. ${s.name}`).join('\n');
+ const answer=prompt('اكتب رقم الطالب الذي تريد تعديل اسمه:\n\n'+list);
+ if(answer===null)return;
+ const i=Number(answer)-1;
+ if(!Number.isInteger(i)||i<0||i>=students.length){alert('رقم الطالب غير صحيح.');return;}
+ const name=prompt('اكتب الاسم الجديد للطالب:',students[i].name);
+ if(name===null||!name.trim())return;
+ students[i].name=name.trim();save();alert('تم تعديل اسم الطالب.');renderContent(c);
+}
+function sortStudents(c){
+ if(!data[c].students.length)return;
+ if(!confirm('هل تريد ترتيب الطلاب أبجديًا؟ سيتم الحفاظ على بيانات كل طالب معه.'))return;
+ // تحويل سجل الحضور من فهارس إلى أسماء ثم إعادته بعد الترتيب
+ const oldStudents=[...data[c].students];
+ const attendance=data[c].attendance;
+ const namedAttendance={};
+ Object.keys(attendance).forEach(date=>{
+   namedAttendance[date]={};
+   oldStudents.forEach((s,i)=>{if(attendance[date][i])namedAttendance[date][s.name]=attendance[date][i];});
+ });
+ data[c].students.sort((a,b)=>a.name.localeCompare(b.name,'ar'));
+ Object.keys(attendance).forEach(date=>{
+   const rebuilt={};
+   data[c].students.forEach((s,i)=>{if(namedAttendance[date][s.name])rebuilt[i]=namedAttendance[date][s.name];});
+   attendance[date]=rebuilt;
+ });
+ recalc(c);save();renderContent(c);
+}
+function clearAttendance(c){
+ if(!Object.keys(data[c].attendance).length){alert('لا يوجد سجل حضور لمسحه.');return;}
+ if(confirm('هل تريد مسح جميع سجلات الحضور والغياب لهذا الصف؟ لن تتأثر الدرجات أو التأخر المسجل في جدول الدرجات.')){
+   data[c].attendance={};
+   data[c].students.forEach(s=>{s.abs=0;});
+   save();renderContent(c);
+ }
+}
+function deleteAllStudents(c){
+ if(!data[c].students.length){alert('لا يوجد طلاب.');return;}
+ const confirmText=prompt(`للتأكيد اكتب: حذف\n\nسيتم حذف جميع طلاب ${c} وجميع درجاتهم وسجل حضورهم.`);
+ if(confirmText!=='حذف')return;
+ data[c].students=[];data[c].attendance={};save();openClass(c);
+}
+
+function studentScore(s){
+ const mem=(s.mem||[]).reduce((a,b)=>a+b,0);
+ const short=(s.short||[]).reduce((a,b)=>a+b,0);
+ return mem+short+(s.t1||0)+(s.t2||0);
+}
+function statsView(c){
+ const students=data[c].students;
+ if(!students.length)return `<div class="card empty">لا يوجد طلاب لعرض الإحصاءات بعد.</div>`;
+ const ranked=[...students].map((s,i)=>({...s,index:i,score:studentScore(s)})).sort((a,b)=>b.score-a.score);
+ const avg=ranked.reduce((a,s)=>a+s.score,0)/ranked.length;
+ const totalAbs=students.reduce((a,s)=>a+(s.abs||0),0);
+ const totalLate=students.reduce((a,s)=>a+(s.late||0),0);
+ const top=ranked[0];
+ return `<div class="summary">
+   <div>👨‍🎓 عدد الطلاب: ${students.length}</div>
+   <div>🏆 أعلى مجموع: ${top.score} — ${top.name}</div>
+   <div>📊 متوسط المجموع: ${avg.toFixed(1)}</div>
+   <div>📅 إجمالي الغياب: ${totalAbs}</div>
+   <div>⏰ إجمالي التأخر: ${totalLate}</div>
+ </div>
+ <div class="card"><div class="title">🏆 ترتيب الطلاب حسب مجموع الدرجات</div>
+ <div class="table-wrap"><table style="min-width:650px"><thead><tr><th>الترتيب</th><th class="name-cell">الطالب</th><th>الحفظ /60</th><th>القصيرة /40</th><th>اختبار 1</th><th>اختبار 2</th><th>المجموع /300</th></tr></thead><tbody>
+ ${ranked.map((s,i)=>`<tr><td>${i+1}${i===0?' 🥇':i===1?' 🥈':i===2?' 🥉':''}</td><td class="name-cell">${s.name}</td><td>${(s.mem||[]).reduce((a,b)=>a+b,0)}</td><td>${(s.short||[]).reduce((a,b)=>a+b,0)}</td><td>${s.t1||0}</td><td>${s.t2||0}</td><td class="total">${s.score}</td></tr>`).join('')}
+ </tbody></table></div></div>
+ <div class="card"><div class="title">📋 ملخص الصف</div><div class="sub">إجمالي الدرجات الممكنة حاليًا: 300 درجة لكل طالب.</div></div>`;
+}
+
+function syncView(c){const connected=!!localStorage.getItem('teacherPlatformDriveFileId'),lastSync=localStorage.getItem('teacherPlatformLastSync');return `<div class="card"><div class="title">☁️ Google Drive والمزامنة</div><div class="card" style="background:#f7faf9;border:1px solid var(--line);box-shadow:none"><div class="toolbar" style="justify-content:space-between"><div><b>حالة Google Drive</b><div class="sub">${connected?'مرتبط — بياناتك يمكن حفظها ومشاركتها بين أجهزتك.':'غير مرتبط — اضغط زر «ربط Google Drive» أعلى الصفحة أولًا.'}</div></div><button class="secondary" onclick="connectGoogleDrive()">🔗 ربط / إعادة ربط</button></div><div class="toolbar" style="margin-top:10px"><button onclick="manualDriveUpload()">☁️ رفع الآن</button><button class="secondary" onclick="manualDriveDownload()">⬇️ تحميل من Google Drive</button></div><div class="sub" style="margin-top:10px">آخر مزامنة: <span id="lastSync">${lastSync?formatDateTime(lastSync):'لم تتم مزامنة بعد'}</span></div></div><div class="card" style="background:#f7faf9;border:1px solid var(--line);box-shadow:none"><div class="toolbar" style="justify-content:space-between"><div><b>المزامنة التلقائية</b><div class="sub" id="syncStatus">${autoSyncEnabled?'مفعّلة — سيتم رفع التغييرات تلقائيًا إلى Google Drive عند وجود اتصال صالح.':'متوقفة — لن يتم الرفع التلقائي.'}</div></div><button id="autoSyncButton" class="${autoSyncEnabled?'':'secondary'}" onclick="toggleAutoSync()">${autoSyncEnabled?'إيقاف المزامنة التلقائية':'تفعيل المزامنة التلقائية'}</button></div></div><div class="card"><b>نسخة احتياطية يدوية</b><div class="toolbar" style="margin-top:10px"><button onclick="exportBackup()">⬇️ تصدير نسخة البيانات</button><label class="secondary" style="padding:10px 14px;border-radius:9px;cursor:pointer">⬆️ استيراد نسخة البيانات<input type="file" accept=".json" onchange="importBackup(event)" style="display:none"></label></div></div><div class="card"><b>حالة البيانات</b><div class="summary"><div>الطلاب في هذا الصف: ${data[c].students.length}</div><div>عدد أيام الحضور المسجلة: ${Object.keys(data[c].attendance).length}</div><div>آخر تعديل: <span id="lastModified">${formatDateTime(localStorage.getItem('teacherPlatformLastModified'))}</span></div></div><div style="margin-top:14px;padding:15px;background:#f0f6f4;border-radius:12px;text-align:center"><b>⏱️ إجمالي زمن استخدام التطبيق</b><div id="usageTimer" style="font-size:22px;font-weight:bold;margin-top:10px;direction:rtl">${formatDuration(getUsageSeconds())}</div><div class="sub">يُحسب الوقت التراكمي الذي تقضيه في استخدام التطبيق.</div></div></div></div>`}
+function refreshSyncStatus(){const l=document.getElementById('lastSync');if(l)l.textContent=formatDateTime(localStorage.getItem('teacherPlatformLastSync'));const m=document.getElementById('lastModified');if(m)m.textContent=formatDateTime(localStorage.getItem('teacherPlatformLastModified'))}
+let syncTimer=null;
+function queueAutoSync(){
+  clearTimeout(syncTimer);
+  syncTimer=setTimeout(()=>{
+    try{
+      // لا نسجل «آخر مزامنة» إلا بعد رفع فعلي ناجح إلى Google Drive.
+      if(!localStorage.getItem('teacherPlatformDriveFileId')) return;
+      pendingDriveAction='upload';
+      requestDriveToken(false);
+    }catch(e){
+      console.error('Auto sync failed',e);
+    }
+  },900);
+}
+function toggleAutoSync(){
+  autoSyncEnabled=!autoSyncEnabled;
+  localStorage.setItem('teacherPlatformAutoSync',String(autoSyncEnabled));
+  const btn=document.getElementById('autoSyncButton');
+  const status=document.getElementById('syncStatus');
+  if(btn){btn.textContent=autoSyncEnabled?'إيقاف المزامنة التلقائية':'تفعيل المزامنة التلقائية';btn.className=autoSyncEnabled?'':'secondary';}
+  if(status)status.textContent=autoSyncEnabled?'مفعّلة — سيتم رفع التغييرات تلقائيًا إلى Google Drive عند وجود اتصال صالح.':'متوقفة — لن يتم الرفع التلقائي.';
+  if(autoSyncEnabled && localStorage.getItem('teacherPlatformDriveFileId')) queueAutoSync();
+}
+
+function startUsageTimer(){
+ const el=document.getElementById('usageTimer');
+ if(!el)return;
+ clearInterval(window.teacherUsageInterval);
+ window.teacherUsageInterval=setInterval(()=>{
+   const current=document.getElementById('usageTimer');
+   if(current)current.textContent=formatDuration(getUsageSeconds());
+   else clearInterval(window.teacherUsageInterval);
+ },1000);
+}
+
+function exportBackup(){
+ const payload={app:'منصة المعلم',version:'1.0',exportedAt:new Date().toISOString(),data:data};
+ const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+ const a=document.createElement('a');
+ a.href=URL.createObjectURL(blob);
+ a.download='teacher_platform_backup_'+new Date().toISOString().slice(0,10)+'.json';
+ document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(a.href);
+}
+function importBackup(event){
+ const file=event.target.files&&event.target.files[0];if(!file)return;
+ const reader=new FileReader();
+ reader.onload=()=>{
+  try{
+   const obj=JSON.parse(reader.result);
+   if(!obj.data)throw new Error('invalid');
+   data=obj.data;
+   classes.forEach(c=>{data[c]??={students:[],attendance:{}};data[c].students??=[];data[c].attendance??={};});
+   save();alert('تم استيراد البيانات بنجاح');
+   home();
+  }catch(e){alert('ملف النسخة الاحتياطية غير صالح.');}
+ };
+ reader.readAsText(file,'UTF-8');
+}
+
+function reportsView(c){
+ const students=data[c].students;
+ return `<div class="report-choice">
+  <button type="button" class="report-card-btn" onclick="classReport('${c}')">
+    <h3>📊 تقرير الصف كاملًا</h3>
+    <div class="sub">يعرض الطلاب والحفظ والاختبارات القصيرة والاختبارات والغياب والتأخر.</div>
+  </button>
+  <div class="card">
+    <h3>👨‍🎓 تقرير طالب</h3>
+    ${students.length?`<select id="reportStudent" onchange="studentReport('${c}',this.value)">
+      <option value="">اختر الطالب</option>
+      ${students.map((s,i)=>`<option value="${i}">${s.name}</option>`).join('')}
+    </select>`:'<div class="sub">لا يوجد طلاب.</div>'}
+  </div>
+ </div>`;
+}
+
+function openReport(title,body){
+  const win=window.open('','_blank');
+  if(!win){
+    alert('لم يتمكن المتصفح من فتح التقرير. يرجى السماح بالنوافذ المنبثقة ثم المحاولة.');
+    return;
+  }
+
+  const printedAt=new Date().toLocaleString('ar-SA',{
+    year:'numeric',month:'long',day:'numeric',
+    hour:'2-digit',minute:'2-digit'
+  });
+
+  win.document.write(`<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${title}</title>
+<style>
+@page{size:A4 landscape;margin:10mm}
+*{box-sizing:border-box}
+body{font-family:Arial,Tahoma,sans-serif;padding:24px;color:#111;margin:0;background:#fff}
+.head{text-align:center;border-bottom:3px solid #176b5b;padding-bottom:14px;margin-bottom:18px}
+.head h2{margin:0 0 8px;color:#176b5b;font-size:26px}
+.school{font-size:16px;font-weight:bold;margin:6px 0}
+.report-title{font-size:19px;font-weight:bold;margin:8px 0}
+.printed{font-size:12px;color:#555;margin-top:8px}
+.actions{text-align:center;margin-bottom:16px}
+.actions button{border:0;border-radius:8px;padding:10px 18px;background:#176b5b;color:#fff;font-size:14px;cursor:pointer}
+.table-wrap{width:100%;overflow:hidden}
+table{border-collapse:collapse;width:100%;table-layout:fixed;font-size:10px}
+th,td{border:1px solid #666;padding:5px 2px;text-align:center;vertical-align:middle;word-break:break-word}
+th{background:#eaf3f0}
+.sign{display:flex;justify-content:space-between;gap:50px;margin-top:45px;text-align:center}
+.sig{flex:1}.line{border-top:1px solid #333;margin-top:30px;padding-top:7px}
+@media(max-width:700px){
+ body{padding:10px}
+ .head h2{font-size:21px}.school{font-size:13px}.report-title{font-size:16px}
+ table{font-size:8px}th,td{padding:3px 1px}
+}
+@media print{
+ body{padding:0}
+ .actions{display:none!important}
+ table{font-size:9px}
+ thead{display:table-header-group}
+ tr{page-break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div class="actions"><button onclick="window.print()">🖨️ طباعة / حفظ PDF</button></div>
+<div class="head">
+  <h2>منصة المعلم</h2>
+  <div class="school">مدرسة / الراشدون الابتدائية والمتوسطة بالمربع</div>
+  <div class="report-title">${title}</div>
+  <div>إعداد: الأستاذ حسن يحيى الشهري</div>
+  <div class="printed">تاريخ ووقت الطباعة: ${printedAt}</div>
+</div>
+<div class="table-wrap">${body}</div>
+<div class="sign">
+  <div class="sig"><div class="line">معلم المادة الأستاذ حسن يحيى الشهري</div></div>
+  <div class="sig"><div class="line">المدير: الأستاذ أحمد سالم الشهري</div></div>
+</div>
+</body>
+</html>`);
+  win.document.close();
+}
+function classReport(c){
+ const students=data[c].students;
+ let body=`<table><thead><tr><th>م</th><th>الطالب</th><th>الغياب</th><th>التأخر</th><th>الحفظ /60</th>${[1,2,3,4].map(x=>`<th>قصير ${x} /10</th>`).join('')}<th>اختبار 1 /100</th><th>اختبار 2 /100</th></tr></thead><tbody>${students.map((s,i)=>{s.short??=[0,0,0,0];return `<tr><td>${i+1}</td><td>${s.name}</td><td>${s.abs||0}</td><td>${(s.mem||[]).reduce((a,b)=>a+b,0)}/60</td>${s.short.map(v=>`<td>${v}/10</td>`).join('')}<td>${s.t1||0}/100</td><td>${s.t2||0}/100</td></tr>`}).join('')}</tbody></table>`;
+ openReport(c+' — تقرير الصف',body);
+}
+function studentReport(c,i){
+ if(i==='')return;const s=data[c].students[i],mem=s.mem||[];s.short??=[0,0,0,0];
+ let body=`<table><tbody><tr><th>اسم الطالب</th><td>${s.name}</td></tr><tr><th>الصف</th><td>${c}</td></tr><tr><th>الغياب</th><td>${s.abs||0}</td></tr><tr><th>التأخر</th><td>${s.late||0}</td></tr>${mem.map((v,x)=>`<tr><th>الحفظ ${x+1}</th><td>${v}/10</td></tr>`).join('')}<tr><th>مجموع الحفظ</th><td>${mem.reduce((a,b)=>a+b,0)}/60</td></tr>${s.short.map((v,x)=>`<tr><th>الاختبار القصير ${x+1}</th><td>${v}/10</td></tr>`).join('')}<tr><th>الاختبار الأول</th><td>${s.t1||0}/100</td></tr><tr><th>الاختبار الثاني</th><td>${s.t2||0}/100</td></tr></tbody></table>`;
+ openReport('تقرير الطالب: '+s.name,body);
+}
+home();
+</script>
+<script>
+function updateMainDateTime(){
+  const now=new Date();
+  const weekday=now.toLocaleDateString('ar-SA',{weekday:'long'});
+  const gregorian=now.toLocaleDateString('ar-SA',{year:'numeric',month:'long',day:'numeric',calendar:'gregory'});
+  const hijri=now.toLocaleDateString('ar-SA-u-ca-islamic',{year:'numeric',month:'long',day:'numeric'});
+  const time=now.toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true});
+  const w=document.getElementById('weekday');
+  const h=document.getElementById('hijriDate');
+  const g=document.getElementById('gregorianDate');
+  const t=document.getElementById('currentTime');
+  if(w)w.textContent=weekday;
+  if(h)h.textContent=hijri;
+  if(g)g.textContent=gregorian;
+  if(t)t.textContent=time;
+}
+updateMainDateTime();
+setInterval(updateMainDateTime,1000);
+</script>
+
+
+<style>
+.behavior-btn{min-width:58px;padding:8px 9px;font-weight:bold;background:#eef4f2;color:#17332d;border:1px solid var(--line)}
+.behavior-btn:hover{background:#176b5b;color:#fff}.private-note-btn{background:#304f88}.bulk-card{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0}.bulk-card select,.bulk-card input{width:auto;min-width:150px}.report-chart{display:flex;align-items:flex-end;gap:4px;height:240px;padding:12px;border:1px solid #ccc;margin:18px 0;background:#fafafa;direction:ltr}.report-bar{flex:1;min-width:10px;position:relative;border-radius:5px 5px 0 0}.report-bar span{position:absolute;bottom:-38px;left:50%;transform:translateX(-50%) rotate(-55deg);transform-origin:top;white-space:nowrap;font-size:9px;color:#111}.report-bar b{position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:10px;color:#111}
+</style><script>
+const behaviorFields=[['privateNote','ملاحظات خاصة'],['late','تأخر'],['excused','مستأذن'],['disruptive','مشاغب'],['talking','يتكلم'],['inattentive','عدم انتباه'],['noBook','بدون كتاب'],['noMushaf','بدون مصحف'],['notWriting','لا يكتب معنا']];
+const gradeFields=[...[1,2,3,4,5,6].map((n,i)=>({key:'mem'+i,label:'حفظ '+n,max:10})),...[1,2,3,4].map((n,i)=>({key:'short'+i,label:'اختبار قصير '+n,max:10})),{key:'t1',label:'اختبار 1',max:100},{key:'t2',label:'اختبار 2',max:100}];
+function ensureStudentExtras(s){s.privateNote??='';s.behaviors??={};behaviorFields.slice(1).forEach(([k])=>s.behaviors[k]??=[]);s.mem??=[null,null,null,null,null,null];s.short??=[null,null,null,null]}
+classes.forEach(c=>data[c].students.forEach(ensureStudentExtras));
+function schoolPeriod(d=new Date()){const m=d.getHours()*60+d.getMinutes(),p=[[420,465,'الأولى'],[465,510,'الثانية'],[510,555,'الثالثة'],[575,620,'الرابعة'],[620,665,'الخامسة'],[665,710,'السادسة'],[710,755,'السابعة']],x=p.find(a=>m>=a[0]&&m<a[1]);return x?x[2]:'خارج وقت الحصة'}
+function arabicDateTime(iso){const d=new Date(iso),day=d.toLocaleDateString('ar-SA',{weekday:'long',calendar:'gregory',numberingSystem:'latn'}),date=d.toLocaleDateString('en-GB',{year:'numeric',month:'2-digit',day:'2-digit'}),time=d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true}).replace('AM','ص').replace('PM','م');return `${day} ${date} — ${time}`}
+function behaviorCount(s,k){ensureStudentExtras(s);return s.behaviors[k].length}
+function addBehavior(c,i,k){const s=data[c].students[i];ensureStudentExtras(s);const now=new Date();s.behaviors[k].push({at:now.toISOString(),period:schoolPeriod(now)});save();renderContent(c)}
+function editPrivateNote(c,i){const s=data[c].students[i];ensureStudentExtras(s);const n=prompt('ملاحظات خاصة بالطالب — لن تظهر في التقارير:',s.privateNote||'');if(n===null)return;s.privateNote=n;save();renderContent(c)}
+function gradeGet(s,key){return key.startsWith('mem')?s.mem[+key.slice(3)]:key.startsWith('short')?s.short[+key.slice(5)]:s[key]}
+function gradeSet(s,key,v){if(key.startsWith('mem'))s.mem[+key.slice(3)]=v;else if(key.startsWith('short'))s.short[+key.slice(5)]=v;else s[key]=v}
+function bulkGrade(c,mode){const key=document.getElementById('bulkField').value,val=document.getElementById('bulkValue').value,f=gradeFields.find(x=>x.key===key);if(mode!=='clear'&&(val===''||isNaN(val))){alert('أدخل درجة صحيحة أولًا.');return}if(mode==='clear'&&!confirm('هل تريد تفريغ هذه الخانة لجميع الطلاب؟'))return;data[c].students.forEach(s=>{ensureStudentExtras(s);const old=gradeGet(s,key);if(mode==='all')gradeSet(s,key,Math.max(0,Math.min(f.max,+val)));if(mode==='empty'&&(old==null||old===''))gradeSet(s,key,Math.max(0,Math.min(f.max,+val)));if(mode==='clear')gradeSet(s,key,null)});save();renderContent(c)}
+function clearOneStudent(c){const i=+document.getElementById('clearStudent').value,key=document.getElementById('clearField').value,s=data[c].students[i];if(!s)return;ensureStudentExtras(s);gradeSet(s,key,null);save();renderContent(c)}
+function gradesView(c){const students=data[c].students;students.forEach(ensureStudentExtras);const opts=gradeFields.map(f=>`<option value="${f.key}">${f.label}</option>`).join('');return `<div class="toolbar card"><input id="studentName" placeholder="اسم الطالب"><button onclick="addStudent('${c}')">＋ إضافة طالب</button><input id="studentSearch" placeholder="🔎 البحث عن طالب" oninput="filterStudents('${c}',this.value)"></div><div class="card bulk-card"><b>⚙️ إدارة الدرجات</b><select id="bulkField">${opts}</select><input id="bulkValue" type="number" placeholder="الدرجة"><button onclick="bulkGrade('${c}','all')">تعبئة الجميع</button><button class="secondary" onclick="bulkGrade('${c}','empty')">تعبئة الخانات الفارغة</button><button class="danger" onclick="bulkGrade('${c}','clear')">تفريغ الخانة للجميع</button></div><div class="card bulk-card"><b>👤 تفريغ درجة طالب محدد</b><select id="clearStudent">${students.map((s,i)=>`<option value="${i}">${s.name}</option>`).join('')}</select><select id="clearField">${opts}</select><button class="secondary" onclick="clearOneStudent('${c}')">تفريغ الدرجة</button></div><div class="table-wrap">${renderTable(c,students)}</div>`}
+function renderTable(c,students){if(!students.length)return '<div class="empty">لا يوجد طلاب بعد — أضف أول طالب من الأعلى.</div>';return `<table><thead><tr><th>م</th><th class="name-cell">اسم الطالب</th><th>ملاحظات 🔒</th>${behaviorFields.slice(1).map(x=>`<th>${x[1]}</th>`).join('')}<th>غياب</th>${[1,2,3,4,5,6].map(x=>`<th>حفظ ${x}</th>`).join('')}<th>المجموع /60</th>${[1,2,3,4].map(x=>`<th>اختبار قصير ${x}</th>`).join('')}<th>مجموع القصيرة</th><th>اختبار 1</th><th>اختبار 2</th><th>المجموع /300</th><th>حذف</th></tr></thead><tbody>${students.map((s,i)=>{ensureStudentExtras(s);const total=s.mem.reduce((a,b)=>a+(+b||0),0),st=s.short.reduce((a,b)=>a+(+b||0),0),g=total+st+(+s.t1||0)+(+s.t2||0);return `<tr><td>${i+1}</td><td class="name-cell">${s.name}</td><td><button class="private-note-btn" onclick="editPrivateNote('${c}',${i})">📝</button></td>${behaviorFields.slice(1).map(([k])=>`<td><button class="behavior-btn" onclick="addBehavior('${c}',${i},'${k}')">${behaviorCount(s,k)}</button></td>`).join('')}<td>${s.abs||0}</td>${s.mem.map((v,x)=>`<td><input type="number" min="0" max="10" value="${v??''}" onchange="setMem('${c}',${i},${x},this.value)"></td>`).join('')}<td>${total}</td>${s.short.map((v,x)=>`<td><input type="number" min="0" max="10" value="${v??''}" onchange="setShort('${c}',${i},${x},this.value)"></td>`).join('')}<td>${st}</td><td><input type="number" min="0" max="100" value="${s.t1??''}" onchange="setField('${c}',${i},'t1',this.value)"></td><td><input type="number" min="0" max="100" value="${s.t2??''}" onchange="setField('${c}',${i},'t2',this.value)"></td><td>${g}</td><td><button class="danger" onclick="removeStudent('${c}',${i})">حذف</button></td></tr>`}).join('')}</tbody></table>`}
+function studentScore(s){ensureStudentExtras(s);return s.mem.reduce((a,b)=>a+(+b||0),0)+s.short.reduce((a,b)=>a+(+b||0),0)+(+s.t1||0)+(+s.t2||0)}
+function colorFor(rank,n){const t=n<=1?0:rank/(n-1),a=[0,92,255],b=[255,221,0],d=[230,45,45],x=t<.5?t*2:(t-.5)*2,p=t<.5?a:b,q=t<.5?b:d;return `rgb(${p.map((v,i)=>Math.round(v+(q[i]-v)*x)).join(',')})`}
+function classReport(c,only=''){const students=data[c].students.map(s=>({s,score:only?Number(gradeGet(s,only)||0):studentScore(s)})).sort((a,b)=>b.score-a.score),max=only?(gradeFields.find(f=>f.key===only).max):300,avg=students.length?students.reduce((a,x)=>a+x.score,0)/students.length:0,label=only?`تقرير درجات الطلاب — ${gradeFields.find(f=>f.key===only).label}`:'تقرير الصف الكامل — ترتيب حسب المتوسط العام';const rows=students.map((x,i)=>`<tr><td>${i+1}</td><td>${x.s.name}</td><td style="background:${colorFor(i,students.length)};font-weight:bold">${x.score.toFixed(1)}</td></tr>`).join(''),chart=students.map((x,i)=>`<div class="report-bar" style="height:${Math.max(3,Math.min(100,x.score/max*100))}%;background:${colorFor(i,students.length)}"><b>${x.score.toFixed(1)}</b><span>${x.s.name}</span></div>`).join('');openReport(c+' — '+label,`<div class="summary"><div>متوسط الفصل: ${avg.toFixed(2)}</div><div>عدد الطلاب: ${students.length}</div></div><table><thead><tr><th>الترتيب</th><th>الطالب</th><th>${only?'الدرجة':'المجموع /300'}</th></tr></thead><tbody>${rows}</tbody></table><h3>الرسم البياني للدرجات</h3><div class="report-chart">${chart}</div>`)}
+function reportsView(c){return `<div class="report-choice"><button class="report-card-btn" onclick="classReport('${c}')"><h3>📊 تقرير الصف كاملًا</h3><div class="sub">ترتيب، متوسط، ألوان متدرجة ورسم بياني.</div></button><div class="card"><h3>📋 تقرير خانة واحدة لجميع الطلاب</h3><select id="singleReportField">${gradeFields.map(f=>`<option value="${f.key}">${f.label}</option>`).join('')}</select><button style="margin-top:10px" onclick="classReport('${c}',document.getElementById('singleReportField').value)">إنشاء التقرير</button></div></div><div class="card"><h3>👤 تقرير طالب</h3><select onchange="studentReport('${c}',this.value)"><option value="">اختر الطالب</option>${data[c].students.map((s,i)=>`<option value="${i}">${s.name}</option>`).join('')}</select></div>`}
+</script>
+
+<style>
+.report-score-table tbody tr:nth-child(odd){background:#f8fafc}
+.report-score-table td.score{font-weight:800}
+.report-chart{height:280px;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:22px 14px 42px;overflow:hidden}
+.report-bar{border-radius:6px 6px 0 0;opacity:.88}
+.behavior-report{margin-top:24px;page-break-inside:avoid}
+.behavior-report h4{margin:16px 0 8px;background:#f1f5f9;padding:8px 12px;border-radius:8px}
+.behavior-report table{width:100%;font-size:13px}
+.behavior-report th{background:#e8eef5;color:#1f2937}
+</style>
+<script>
+function softColorFor(rank,n){
+ const t=n<=1?0:rank/(n-1);
+ const stops=[[56,115,190],[151,187,205],[231,202,96],[218,135,108],[190,77,77]];
+ const z=t*(stops.length-1),i=Math.min(stops.length-2,Math.floor(z)),f=z-i,a=stops[i],b=stops[i+1];
+ return `rgb(${a.map((v,j)=>Math.round(v+(b[j]-v)*f)).join(',')})`;
+}
+function formatBehaviorEntry(e,i){
+ return `${i+1}. ${e.period||'خارج وقت الحصة'} — ${arabicDateTime(e.at)}`;
+}
+function fullBehaviorReport(students){
+ let html='<section class="behavior-report"><h3>سجل السلوكيات والمتابعة</h3>';
+ let any=false;
+ students.forEach(x=>{
+   const s=x.s||x;
+   ensureStudentExtras(s);
+   const items=behaviorFields.slice(1).filter(([k])=>s.behaviors[k]&&s.behaviors[k].length);
+   if(!items.length)return;
+   any=true;
+   html+=`<h4>${s.name}</h4><table><thead><tr><th>البند</th><th>عدد المرات</th><th>تفاصيل الوقائع</th></tr></thead><tbody>`;
+   items.forEach(([k,label])=>{
+     html+=`<tr><td>${label}</td><td>${s.behaviors[k].length}</td><td>${s.behaviors[k].map(formatBehaviorEntry).join('<br>')}</td></tr>`;
+   });
+   html+='</tbody></table>';
+ });
+ html+='</section>';
+ return any?html:'<section class="behavior-report"><h3>سجل السلوكيات والمتابعة</h3><p>لا توجد وقائع مسجلة حتى الآن.</p></section>';
+}
+function classReport(c,only=''){
+ const students=data[c].students.map(s=>({s,score:only?Number(gradeGet(s,only)||0):studentScore(s)})).sort((a,b)=>b.score-a.score);
+ const max=only?(gradeFields.find(f=>f.key===only)?.max||100):300;
+ const avg=students.length?students.reduce((a,x)=>a+x.score,0)/students.length:0;
+ const label=only?`تقرير درجات الطلاب — ${gradeFields.find(f=>f.key===only).label}`:'تقرير الصف الكامل — ترتيب الطلاب';
+ const rows=students.map((x,i)=>{
+   const col=softColorFor(i,students.length);
+   return `<tr><td>${i+1}</td><td>${x.s.name}</td><td class="score" style="background:${col};color:#fff">${x.score.toFixed(1)}</td></tr>`;
+ }).join('');
+ const chart=students.map((x,i)=>{
+   const col=softColorFor(i,students.length),h=Math.max(4,Math.min(100,x.score/max*100));
+   return `<div class="report-bar" style="height:${h}%;background:${col}"><b>${x.score.toFixed(1)}</b><span>${x.s.name}</span></div>`;
+ }).join('');
+ let body=`<div class="summary"><div>متوسط الفصل: ${avg.toFixed(2)}</div><div>عدد الطلاب: ${students.length}</div></div>
+ <table class="report-score-table"><thead><tr><th>الترتيب</th><th>الطالب</th><th>${only?'الدرجة':'المجموع /300'}</th></tr></thead><tbody>${rows}</tbody></table>
+ <h3>الرسم البياني للدرجات</h3><div class="report-chart">${chart}</div>`;
+ if(!only) body+=fullBehaviorReport(students);
+ openReport(c+' — '+label,body);
+}
+</script>
+
+
+<style>
+/* رسم بياني جديد: قائمة أفقية أنيقة وواضحة للطباعة */
+.report-chart{
+  height:auto!important;
+  display:block!important;
+  padding:18px 16px!important;
+  border:1px solid #e2e8f0!important;
+  border-radius:14px!important;
+  background:#fff!important;
+  direction:rtl!important;
+  overflow:visible!important;
+}
+.report-chart-title{
+  font-weight:800;
+  margin-bottom:14px;
+  color:#334155;
+}
+.horizontal-chart-row{
+  display:grid;
+  grid-template-columns:minmax(110px,1fr) 5fr 52px;
+  gap:10px;
+  align-items:center;
+  margin:9px 0;
+}
+.horizontal-chart-name{
+  font-size:12px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.horizontal-chart-track{
+  height:18px;
+  background:#eef2f7;
+  border-radius:999px;
+  overflow:hidden;
+}
+.horizontal-chart-fill{
+  height:100%;
+  border-radius:999px;
+  transition:width .3s ease;
+}
+.horizontal-chart-value{
+  font-weight:800;
+  font-size:12px;
+  text-align:left;
+  direction:ltr;
+}
+@media print{
+  .horizontal-chart-row{break-inside:avoid;page-break-inside:avoid}
+}
+</style>
+<script>
+function classReport(c,only=''){
+ const students=data[c].students
+   .map(s=>({s,score:only?Number(gradeGet(s,only)||0):studentScore(s)}))
+   .sort((a,b)=>b.score-a.score);
+
+ const max=only?(gradeFields.find(f=>f.key===only)?.max||100):300;
+ const avg=students.length?students.reduce((a,x)=>a+x.score,0)/students.length:0;
+ const label=only
+   ?`تقرير درجات الطلاب — ${gradeFields.find(f=>f.key===only).label}`
+   :'تقرير الصف الكامل — ترتيب الطلاب';
+
+ const rows=students.map((x,i)=>{
+   const col=softColorFor(i,students.length);
+   return `<tr>
+     <td>${i+1}</td>
+     <td>${x.s.name}</td>
+     <td class="score" style="background:${col};color:#fff">${x.score.toFixed(1)}</td>
+   </tr>`;
+ }).join('');
+
+ const chart=students.map((x,i)=>{
+   const col=softColorFor(i,students.length);
+   const pct=Math.max(0,Math.min(100,(x.score/max)*100));
+   return `<div class="horizontal-chart-row">
+      <div class="horizontal-chart-name">${i+1}. ${x.s.name}</div>
+      <div class="horizontal-chart-track">
+        <div class="horizontal-chart-fill" style="width:${pct}%;background:${col}"></div>
+      </div>
+      <div class="horizontal-chart-value">${x.score.toFixed(1)}</div>
+   </div>`;
+ }).join('');
+
+ let body=`
+ <div class="summary">
+   <div>متوسط الفصل: ${avg.toFixed(2)}</div>
+   <div>عدد الطلاب: ${students.length}</div>
+ </div>
+
+ <table class="report-score-table">
+   <thead>
+     <tr>
+       <th>الترتيب</th>
+       <th>الطالب</th>
+       <th>${only?'الدرجة':'المجموع /300'}</th>
+     </tr>
+   </thead>
+   <tbody>${rows}</tbody>
+ </table>
+
+ <div class="report-chart">
+   <div class="report-chart-title">مقارنة درجات الطلاب</div>
+   ${chart}
+ </div>`;
+
+ if(!only) body+=fullBehaviorReport(students);
+
+ openReport(c+' — '+label,body);
+}
+</script>
+
+
+<style>
+.donut-section{margin:24px 0;padding:20px;border:1px solid #e2e8f0;border-radius:16px;background:#fff}
+.donut-layout{display:flex;gap:28px;align-items:center;justify-content:center;flex-wrap:wrap}
+.donut-chart{width:250px;height:250px;border-radius:50%;position:relative;box-shadow:0 8px 24px rgba(15,23,42,.08)}
+.donut-hole{position:absolute;inset:58px;border-radius:50%;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;box-shadow:inset 0 0 0 1px #eef2f7}
+.donut-hole b{font-size:34px;color:#334155}.donut-hole span{font-size:13px;color:#64748b}
+.donut-legend{min-width:230px}.donut-item{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:9px 0;border-bottom:1px solid #eef2f7}.donut-key{display:flex;align-items:center;gap:8px}.donut-dot{width:12px;height:12px;border-radius:50%}
+@media print{.donut-section{break-inside:avoid;page-break-inside:avoid}}
+</style>
+<script>
+function levelData(students,max){
+ const levels=[
+  {name:'ممتاز',min:.90,color:'#3b82c4'},
+  {name:'جيد جدًا',min:.75,color:'#58a99a'},
+  {name:'متوسط',min:.60,color:'#d5b64b'},
+  {name:'يحتاج إلى تحسين',min:.40,color:'#d78b52'},
+  {name:'منخفض',min:0,color:'#bf6666'}
+ ];
+ const counts=levels.map(x=>({...x,count:0}));
+ students.forEach(x=>{
+  const ratio=max?x.score/max:0;
+  const found=counts.find(l=>ratio>=l.min)||counts[counts.length-1];
+  found.count++;
+ });
+ return counts;
+}
+function donutHTML(students,max){
+ const levels=levelData(students,max),total=students.length||1;
+ let angle=0,parts=[];
+ levels.forEach(l=>{const start=angle,end=angle+(l.count/total*360);if(l.count){parts.push(`${l.color} ${start}deg ${end}deg`);angle=end}});
+ const bg=parts.length?`conic-gradient(${parts.join(',')})`:'#eef2f7';
+ const legend=levels.map(l=>`<div class="donut-item"><div class="donut-key"><span class="donut-dot" style="background:${l.color}"></span><span>${l.name}</span></div><b>${l.count} طالب</b></div>`).join('');
+ return `<div class="donut-section"><h3>توزيع مستويات الطلاب</h3><div class="donut-layout"><div class="donut-chart" style="background:${bg}"><div class="donut-hole"><b>${students.length}</b><span>عدد الطلاب</span></div></div><div class="donut-legend">${legend}</div></div></div>`;
+}
+function classReport(c,only=''){
+ const students=data[c].students.map(s=>({s,score:only?Number(gradeGet(s,only)||0):studentScore(s)})).sort((a,b)=>b.score-a.score);
+ const max=only?(gradeFields.find(f=>f.key===only)?.max||100):300;
+ const avg=students.length?students.reduce((a,x)=>a+x.score,0)/students.length:0;
+ const label=only?`تقرير درجات الطلاب — ${gradeFields.find(f=>f.key===only).label}`:'تقرير الصف الكامل — ترتيب الطلاب';
+ const rows=students.map((x,i)=>`<tr><td>${i+1}</td><td>${x.s.name}</td><td class="score" style="background:${softColorFor(i,students.length)};color:#fff">${x.score.toFixed(1)}</td></tr>`).join('');
+ let body=`<div class="summary"><div>متوسط الفصل: ${avg.toFixed(2)}</div><div>عدد الطلاب: ${students.length}</div></div><table class="report-score-table"><thead><tr><th>الترتيب</th><th>الطالب</th><th>${only?'الدرجة':'المجموع /300'}</th></tr></thead><tbody>${rows}</tbody></table>${donutHTML(students,max)}`;
+ if(!only) body+=fullBehaviorReport(students);
+ openReport(c+' — '+label,body);
+}
+</script>
+
+
+<style>
+/* مخطط أعمدة عمودي ثابت باستخدام SVG — متوافق مع المتصفح والطباعة */
+.excel-chart-card{
+  margin:24px 0;
+  padding:22px 18px 18px;
+  background:#fff;
+  border:1px solid #dfe5ec;
+  border-radius:14px;
+  box-shadow:0 5px 18px rgba(15,23,42,.06);
+  overflow:hidden;
+}
+.excel-chart-title{text-align:center;font-size:18px;font-weight:800;margin:0 0 6px;color:#243447}
+.excel-chart-subtitle{text-align:center;font-size:12px;color:#64748b;margin-bottom:14px}
+.excel-svg-wrap{width:100%;overflow-x:auto;padding-bottom:4px;direction:ltr}
+.excel-svg{display:block;min-width:640px;width:100%;height:auto;background:#fff}
+@media print{
+  .excel-chart-card{break-inside:avoid;page-break-inside:avoid;box-shadow:none}
+  .excel-svg-wrap{overflow:visible}
+  .excel-svg{min-width:0;width:100%}
+}
+</style>
+
+<script>
+function chartPalette(){
+  return ['#4e79a7','#76b7b2','#59a14f','#f28e2b','#e15759'];
+}
+function escapeSvgText(v){
+  return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function studentChartSeries(students,only){
+  if(only){
+    const f=gradeFields.find(x=>x.key===only);
+    return [{label:f?.label||'الدرجة',color:'#4e79a7',values:students.map(x=>Number(gradeGet(x.s,only)||0)/(f?.max||100)*100)}];
+  }
+  const mem=gradeFields.filter(f=>f.key.startsWith('mem'));
+  const sh=gradeFields.filter(f=>f.key.startsWith('short'));
+  const avg=(s,arr)=>arr.length?arr.reduce((a,f)=>a+Number(gradeGet(s,f.key)||0)/(f.max||1)*100,0)/arr.length:0;
+  return [
+    {label:'الحفظ',color:'#4e79a7',values:students.map(x=>avg(x.s,mem))},
+    {label:'الاختبارات القصيرة',color:'#76b7b2',values:students.map(x=>avg(x.s,sh))},
+    {label:'الاختبار الأول',color:'#f28e2b',values:students.map(x=>Number(gradeGet(x.s,'t1')||0))},
+    {label:'الاختبار الثاني',color:'#e15759',values:students.map(x=>Number(gradeGet(x.s,'t2')||0))}
+  ];
+}
+function excelVerticalChart(students,max,only=''){
+  const series=studentChartSeries(students,only);
+  const n=Math.max(students.length,1), m=series.length;
+  const W=Math.max(900,n*125+180), H=520;
+  const L=72,R=170,T=42,B=115;
+  const CW=W-L-R, CH=H-T-B;
+  const slot=CW/n, gap=3, groupW=Math.min(slot*0.76,100), barW=Math.max(10,(groupW-gap*(m-1))/m);
+  let svg=`<svg class="excel-svg" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="مخطط أعمدة درجات الطلاب">`;
+  svg+=`<rect x="0" y="0" width="${W}" height="${H}" fill="#ffffff"/>`;
+  [0,20,40,60,80,100].forEach(t=>{const y=T+CH-(t/100)*CH;svg+=`<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="#d9dde3" stroke-width="1"/>`;svg+=`<text x="${L-12}" y="${y+5}" text-anchor="end" font-size="13" fill="#475569">${t}</text>`;});
+  svg+=`<line x1="${L}" y1="${T}" x2="${L}" y2="${T+CH}" stroke="#64748b" stroke-width="1.5"/>`;
+  svg+=`<line x1="${L}" y1="${T+CH}" x2="${W-R}" y2="${T+CH}" stroke="#64748b" stroke-width="1.5"/>`;
+  students.forEach((x,i)=>{
+    const gx=L+i*slot+(slot-groupW)/2;
+    series.forEach((ser,j)=>{
+      const pct=Math.max(0,Math.min(100,Number(ser.values[i]||0))), h=CH*pct/100, bx=gx+j*(barW+gap), y=T+CH-h;
+      svg+=`<rect x="${bx}" y="${y}" width="${barW}" height="${Math.max(1,h)}" fill="${ser.color}"/>`;
+      if(pct>=8) svg+=`<text x="${bx+barW/2}" y="${Math.max(T+13,y-6)}" text-anchor="middle" font-size="10" font-weight="700" fill="#334155">${pct.toFixed(0)}</text>`;
+    });
+    const tx=L+i*slot+slot/2, ty=T+CH+22, name=escapeSvgText((x.s.name||'').trim());
+    svg+=`<text x="${tx}" y="${ty}" text-anchor="end" transform="rotate(-42 ${tx} ${ty})" font-size="12" fill="#263238">${name}</text>`;
+  });
+  series.forEach((ser,i)=>{const y=T+12+i*30;svg+=`<rect x="${W-R+28}" y="${y}" width="18" height="18" fill="${ser.color}"/>`;svg+=`<text x="${W-R+52}" y="${y+14}" font-size="13" fill="#334155">${escapeSvgText(ser.label)}</text>`;});
+  svg+=`<text x="${(L+W-R)/2}" y="${H-14}" text-anchor="middle" font-size="14" font-weight="700" fill="#334155">الطلاب</text>`;
+  svg+=`</svg>`;
+  const subtitle=only?'مقارنة درجات الطلاب في الخانة المختارة':'مقارنة مستويات الطلاب في الحفظ والاختبارات';
+  return `<section class="excel-chart-card"><h3 class="excel-chart-title">رسم بياني عمودي لمستوى الطلاب</h3><div class="excel-chart-subtitle">${subtitle}</div><div class="excel-svg-wrap">${svg}</div></section>`;
+}
+function classReport(c,only=''){
+  const students=data[c].students.map(s=>({s,score:only?Number(gradeGet(s,only)||0):studentScore(s)})).sort((a,b)=>b.score-a.score);
+  const max=only?(gradeFields.find(f=>f.key===only)?.max||100):300;
+  const avg=students.length?students.reduce((a,x)=>a+x.score,0)/students.length:0;
+  const label=only?`تقرير درجات الطلاب — ${gradeFields.find(f=>f.key===only).label}`:'تقرير الصف الكامل — ترتيب الطلاب';
+  const rows=students.map((x,i)=>`<tr><td>${i+1}</td><td>${x.s.name}</td><td class="score" style="background:${softColorFor(i,students.length)};color:#fff">${x.score.toFixed(1)}</td></tr>`).join('');
+  let body=`<div class="summary"><div>متوسط الفصل: ${avg.toFixed(2)}</div><div>عدد الطلاب: ${students.length}</div></div><table class="report-score-table"><thead><tr><th>الترتيب</th><th>الطالب</th><th>${only?'الدرجة':'المجموع /300'}</th></tr></thead><tbody>${rows}</tbody></table>${excelVerticalChart(students,max,only)}`;
+  if(!only) body+=fullBehaviorReport(students);
+  openReport(c+' — '+label,body);
+}
+</script>
+
+
+<script>
+/* ===== تحديث آمن: سلوكيات سريعة + تقارير وإحصاءات السادس أ + ب ===== */
+function addBehavior(c,i,k){
+  const s=data[c].students[i];
+  ensureStudentExtras(s);
+  const now=new Date();
+  s.behaviors[k].push({at:now.toISOString(),period:schoolPeriod(now)});
+  save();
+  renderContent(c);
+}
+
+function isSixthClass(c){
+  return c==='الصف السادس الابتدائي أ'||c==='الصف السادس الابتدائي ب';
+}
+function getSixthStudents(){
+  return ['الصف السادس الابتدائي أ','الصف السادس الابتدائي ب']
+    .flatMap(cls=>(data[cls]?.students||[]).map(s=>({s,c:cls,score:studentScore(s)})))
+    .sort((a,b)=>b.score-a.score);
+}
+function combinedSixthBehaviorTotals(items){
+  const totals={};
+  behaviorFields.slice(1).forEach(([k])=>totals[k]=0);
+  items.forEach(({s})=>{
+    ensureStudentExtras(s);
+    behaviorFields.slice(1).forEach(([k])=>totals[k]+=(s.behaviors[k]||[]).length);
+  });
+  return totals;
+}
+
+function combinedSixthReport(mode='both'){
+  const students=getSixthStudents();
+  if(!students.length){alert('لا يوجد طلاب في الصف السادس أ + ب.');return;}
+  const avg=students.reduce((sum,x)=>sum+x.score,0)/students.length;
+  let body='';
+  if(mode==='grades'||mode==='both'){
+    const rows=students.map((x,i)=>
+      `<tr><td>${i+1}</td><td>${x.s.name}</td><td>${x.c}</td><td>${x.score.toFixed(1)}</td></tr>`
+    ).join('');
+    body+=`<div class="summary"><div><b>ترتيب موحد لجميع طلاب السادس أ + ب</b></div><div>عدد الطلاب: ${students.length}</div><div>المتوسط العام: ${avg.toFixed(2)}</div></div>
+    <table class="report-score-table"><thead><tr><th>الترتيب</th><th>الطالب</th><th>الصف</th><th>المجموع /300</th></tr></thead><tbody>${rows}</tbody></table>`;
+  }
+  if(mode==='behaviors'||mode==='both') body+=fullBehaviorReport(students);
+  openReport('تقرير موحد — الصف السادس الابتدائي أ + ب',body);
+}
+
+function statsView(c){
+  if(isSixthClass(c)){
+    const ranked=getSixthStudents();
+    if(!ranked.length)return `<div class="card empty">لا يوجد طلاب في الصف السادس أ + ب لعرض الإحصاءات بعد.</div>`;
+    const a=data['الصف السادس الابتدائي أ']?.students||[];
+    const b=data['الصف السادس الابتدائي ب']?.students||[];
+    const avg=ranked.reduce((sum,x)=>sum+x.score,0)/ranked.length;
+    const totalAbs=ranked.reduce((sum,x)=>sum+(x.s.abs||0),0);
+    const totalLate=ranked.reduce((sum,x)=>sum+(x.s.late||0),0);
+    const behaviorTotals=combinedSixthBehaviorTotals(ranked);
+    const behaviorSummary=behaviorFields.slice(1).map(([k,label])=>`<div>${label}: <b>${behaviorTotals[k]}</b></div>`).join('');
+    const rows=ranked.map((x,i)=>`<tr><td>${i+1}${i===0?' 🥇':i===1?' 🥈':i===2?' 🥉':''}</td><td class="name-cell">${x.s.name}</td><td>${x.c}</td><td>${(x.s.mem||[]).reduce((p,v)=>p+(+v||0),0)}</td><td>${(x.s.short||[]).reduce((p,v)=>p+(+v||0),0)}</td><td>${+x.s.t1||0}</td><td>${+x.s.t2||0}</td><td class="total">${x.score.toFixed(1)}</td></tr>`).join('');
+    return `<div class="card"><div class="title">🏫 إحصاءات موحدة — الصف السادس الابتدائي أ + ب</div><div class="sub">البيانات والترتيب محسوبة على مستوى الصفين كاملين.</div></div>
+    <div class="summary"><div>👨‍🎓 إجمالي الطلاب: ${ranked.length}</div><div>السادس أ: ${a.length} طالب</div><div>السادس ب: ${b.length} طالب</div><div>🏆 أعلى طالب: ${ranked[0].s.name} — ${ranked[0].score.toFixed(1)}</div><div>📊 المتوسط العام: ${avg.toFixed(1)}</div><div>📅 إجمالي الغياب: ${totalAbs}</div><div>⏰ إجمالي التأخر: ${totalLate}</div></div>
+    <div class="card"><div class="title">🏆 الترتيب الموحد للصف السادس أ + ب</div><div class="table-wrap"><table style="min-width:760px"><thead><tr><th>الترتيب</th><th class="name-cell">الطالب</th><th>الصف</th><th>الحفظ /60</th><th>القصيرة /40</th><th>اختبار 1</th><th>اختبار 2</th><th>المجموع /300</th></tr></thead><tbody>${rows}</tbody></table></div></div>
+    <div class="card"><div class="title">📌 إحصاءات السلوكيات — السادس أ + ب</div><div class="summary">${behaviorSummary}</div></div>`;
+  }
+  const students=data[c].students;
+  if(!students.length)return `<div class="card empty">لا يوجد طلاب لعرض الإحصاءات بعد.</div>`;
+  const ranked=[...students].map((s,i)=>({...s,index:i,score:studentScore(s)})).sort((a,b)=>b.score-a.score);
+  const avg=ranked.reduce((a,s)=>a+s.score,0)/ranked.length;
+  const totalAbs=students.reduce((a,s)=>a+(s.abs||0),0);
+  const totalLate=students.reduce((a,s)=>a+(s.late||0),0);
+  const top=ranked[0];
+  return `<div class="summary"><div>👨‍🎓 عدد الطلاب: ${students.length}</div><div>🏆 أعلى مجموع: ${top.score} — ${top.name}</div><div>📊 متوسط المجموع: ${avg.toFixed(1)}</div><div>📅 إجمالي الغياب: ${totalAbs}</div><div>⏰ إجمالي التأخر: ${totalLate}</div></div>
+  <div class="card"><div class="title">🏆 ترتيب الطلاب حسب مجموع الدرجات</div><div class="table-wrap"><table style="min-width:650px"><thead><tr><th>الترتيب</th><th class="name-cell">الطالب</th><th>الحفظ /60</th><th>القصيرة /40</th><th>اختبار 1</th><th>اختبار 2</th><th>المجموع /300</th></tr></thead><tbody>${ranked.map((s,i)=>`<tr><td>${i+1}${i===0?' 🥇':i===1?' 🥈':i===2?' 🥉':''}</td><td class="name-cell">${s.name}</td><td>${(s.mem||[]).reduce((a,b)=>a+b,0)}</td><td>${(s.short||[]).reduce((a,b)=>a+b,0)}</td><td>${s.t1||0}</td><td>${s.t2||0}</td><td class="total">${s.score}</td></tr>`).join('')}</tbody></table></div></div>
+  <div class="card"><div class="title">📋 ملخص الصف</div><div class="sub">إجمالي الدرجات الممكنة حاليًا: 300 درجة لكل طالب.</div></div>`;
+}
+</script>
+
+
+<!-- PATCH v6: إرجاع التقارير كما كانت + إحصاءات الصف والصفين -->
+<script>
+/* ===== إحصاءات السادس أ + ب: لكل صف على حدة أو موحدة ===== */
+window.sixthStatsMode = window.sixthStatsMode || 'combined';
+
+function setSixthStatsMode(c,mode){
+  window.sixthStatsMode=mode;
+  renderContent(c);
+}
+
+function singleClassStatsView(c){
+  const students=data[c].students;
+  if(!students.length)return `<div class="card empty">لا يوجد طلاب لعرض الإحصاءات بعد.</div>`;
+  const ranked=[...students].map((s,i)=>({...s,index:i,score:studentScore(s)})).sort((a,b)=>b.score-a.score);
+  const avg=ranked.reduce((a,s)=>a+s.score,0)/ranked.length;
+  const totalAbs=students.reduce((a,s)=>a+(s.abs||0),0);
+  const totalLate=students.reduce((a,s)=>a+(s.late||0),0);
+  const top=ranked[0];
+  const rows=ranked.map((s,i)=>`<tr><td>${i+1}${i===0?' 🥇':i===1?' 🥈':i===2?' 🥉':''}</td><td class="name-cell">${s.name}</td><td>${(s.mem||[]).reduce((a,b)=>a+(+b||0),0)}</td><td>${(s.short||[]).reduce((a,b)=>a+(+b||0),0)}</td><td>${+s.t1||0}</td><td>${+s.t2||0}</td><td class="total">${Number(s.score||0).toFixed(1)}</td></tr>`).join('');
+  const behaviorSummary=behaviorFields.slice(1).map(([k,label])=>{
+    const n=students.reduce((sum,s)=>{ensureStudentExtras(s);return sum+(s.behaviors[k]||[]).length},0);
+    return `<div>${label}: <b>${n}</b></div>`;
+  }).join('');
+  return `<div class="summary"><div>👨‍🎓 عدد الطلاب: ${students.length}</div><div>🏆 أعلى مجموع: ${Number(top.score||0).toFixed(1)} — ${top.name}</div><div>📊 متوسط المجموع: ${avg.toFixed(1)}</div><div>📅 إجمالي الغياب: ${totalAbs}</div><div>⏰ إجمالي التأخر: ${totalLate}</div></div>
+  <div class="card"><div class="title">📌 إحصاءات السلوكيات — ${c}</div><div class="summary">${behaviorSummary}</div></div>
+  <div class="card"><div class="title">🏆 ترتيب طلاب ${c} حسب مجموع الدرجات</div><div class="table-wrap"><table style="min-width:760px"><thead><tr><th>الترتيب</th><th class="name-cell">الطالب</th><th>الحفظ /60</th><th>القصيرة /40</th><th>اختبار 1</th><th>اختبار 2</th><th>المجموع /300</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+}
+
+function combinedSixthStatsView(){
+  const ranked=getSixthStudents();
+  if(!ranked.length)return `<div class="card empty">لا يوجد طلاب في الصف السادس أ + ب لعرض الإحصاءات بعد.</div>`;
+  const a=data['الصف السادس الابتدائي أ']?.students||[];
+  const b=data['الصف السادس الابتدائي ب']?.students||[];
+  const avg=ranked.reduce((sum,x)=>sum+x.score,0)/ranked.length;
+  const totalAbs=ranked.reduce((sum,x)=>sum+(x.s.abs||0),0);
+  const totalLate=ranked.reduce((sum,x)=>sum+(x.s.late||0),0);
+  const behaviorTotals=combinedSixthBehaviorTotals(ranked);
+  const behaviorSummary=behaviorFields.slice(1).map(([k,label])=>`<div>${label}: <b>${behaviorTotals[k]}</b></div>`).join('');
+  const rows=ranked.map((x,i)=>`<tr><td>${i+1}${i===0?' 🥇':i===1?' 🥈':i===2?' 🥉':''}</td><td class="name-cell">${x.s.name}</td><td>${x.c}</td><td>${(x.s.mem||[]).reduce((p,v)=>p+(+v||0),0)}</td><td>${(x.s.short||[]).reduce((p,v)=>p+(+v||0),0)}</td><td>${+x.s.t1||0}</td><td>${+x.s.t2||0}</td><td class="total">${Number(x.score||0).toFixed(1)}</td></tr>`).join('');
+  return `<div class="card"><div class="title">🏫 إحصاءات موحدة — الصف السادس الابتدائي أ + ب</div><div class="sub">البيانات والترتيب محسوبة على مستوى الصفين كاملين.</div></div>
+  <div class="summary"><div>👨‍🎓 إجمالي الطلاب: ${ranked.length}</div><div>السادس أ: ${a.length} طالب</div><div>السادس ب: ${b.length} طالب</div><div>🏆 أعلى طالب: ${ranked[0].s.name} — ${Number(ranked[0].score||0).toFixed(1)}</div><div>📊 المتوسط العام: ${avg.toFixed(1)}</div><div>📅 إجمالي الغياب: ${totalAbs}</div><div>⏰ إجمالي التأخر: ${totalLate}</div></div>
+  <div class="card"><div class="title">📌 إحصاءات السلوكيات — السادس أ + ب</div><div class="summary">${behaviorSummary}</div></div>
+  <div class="card"><div class="title">🏆 الترتيب الموحد للصف السادس أ + ب</div><div class="table-wrap"><table style="min-width:820px"><thead><tr><th>الترتيب</th><th class="name-cell">الطالب</th><th>الصف</th><th>الحفظ /60</th><th>القصيرة /40</th><th>اختبار 1</th><th>اختبار 2</th><th>المجموع /300</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+}
+
+function statsView(c){
+  if(isSixthClass(c)){
+    const a='الصف السادس الابتدائي أ', b='الصف السادس الابتدائي ب';
+    const mode=window.sixthStatsMode||'combined';
+    const content=mode==='a'?singleClassStatsView(a):mode==='b'?singleClassStatsView(b):combinedSixthStatsView();
+    return `<div class="card sixth-stats-switch">
+      <div class="title">📈 اختيار نطاق الإحصاءات</div>
+      <div class="sub">يمكنك عرض إحصاءات الصف الحالي، أو الصف الآخر، أو الصفين السادس أ + ب معًا.</div>
+      <div class="report-mode-actions">
+        <button class="${mode==='combined'?'':'secondary'}" onclick="setSixthStatsMode('${c}','combined')">🏫 السادس أ + ب معًا</button>
+        <button class="${mode==='a'?'':'secondary'}" onclick="setSixthStatsMode('${c}','a')">📘 السادس أ فقط</button>
+        <button class="${mode==='b'?'':'secondary'}" onclick="setSixthStatsMode('${c}','b')">📗 السادس ب فقط</button>
+      </div>
+    </div>${content}`;
+  }
+  return singleClassStatsView(c);
+}
+</script>
+
+</body></html>
+
+
+<!-- SAFE ENHANCEMENT PATCH: appended after original application -->
+<style>
+.student-admin-actions{display:flex;gap:5px;justify-content:flex-start;align-items:center;white-space:nowrap}
+.student-admin-actions button{padding:6px 8px;font-size:12px;border-radius:7px}
+.student-edit-btn{background:#eaf3ff;color:#1d4ed8;border:1px solid #bfdbfe}
+.student-move-btn{background:#f8fafc;color:#334155;border:1px solid #cbd5e1}
+.note-preview{min-width:110px;max-width:220px;min-height:32px;padding:6px 8px;border-radius:7px;border:1px dashed #cbd5e1;background:#fff;text-align:right;cursor:pointer;white-space:pre-wrap;word-break:break-word}
+.note-preview.empty{color:#94a3b8;font-style:italic}
+.behavior-cell{display:flex;flex-direction:column;align-items:center;gap:3px}
+.behavior-undo{font-size:10px!important;padding:2px 6px!important;background:#fff3f3!important;color:#b91c1c!important;border:1px solid #fecaca!important}
+.report-mode-actions{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+.report-mode-actions button{flex:1;min-width:170px}
+</style>
+<script>
+/* ===== أدوات إدارة الطلاب ===== */
+function editStudentName(c,i){
+ const s=data[c].students[i];
+ const n=prompt('اكتب الاسم الجديد للطالب:',s.name||'');
+ if(n===null)return;
+ if(!n.trim()){alert('اسم الطالب لا يمكن أن يكون فارغًا.');return;}
+ s.name=n.trim(); save(); renderContent(c);
+}
+function moveStudentToRow(c,i){
+ const students=data[c].students;
+ const raw=prompt('إلى أي رقم تريد نقل الطالب؟\nمن 1 إلى '+students.length,String(i+1));
+ if(raw===null)return;
+ const target=Number(raw)-1;
+ if(!Number.isInteger(target)||target<0||target>=students.length){alert('رقم السطر غير صحيح.');return;}
+ if(target===i)return;
+ const oldStudents=students.slice();
+ const moved=students.splice(i,1)[0];
+ students.splice(target,0,moved);
+ const newIndex=new Map(students.map((s,idx)=>[s,idx]));
+ Object.keys(data[c].attendance||{}).forEach(date=>{
+   const old=data[c].attendance[date]||{}, updated={};
+   oldStudents.forEach((student,oldIdx)=>{
+     if(Object.prototype.hasOwnProperty.call(old,oldIdx)) updated[newIndex.get(student)]=old[oldIdx];
+   });
+   data[c].attendance[date]=updated;
+ });
+ save(); renderContent(c);
+}
+function notePreview(c,i){
+ const s=data[c].students[i];ensureStudentExtras(s);
+ const note=(s.privateNote||'').trim();
+ return '<div class="note-preview '+(note?'':'empty')+'" onclick="editPrivateNote(\''+c+'\','+i+')">'+(note||'اكتب ملاحظة…')+'</div>';
+}
+
+/* ===== السلوكيات: تأكيد وتراجع ===== */
+function addBehavior(c,i,k){
+ const s=data[c].students[i];
+ ensureStudentExtras(s);
+ const now=new Date();
+ s.behaviors[k].push({at:now.toISOString(),period:schoolPeriod(now)});
+ save();
+ renderContent(c);
+}
+function undoBehavior(c,i,k){
+ const s=data[c].students[i];ensureStudentExtras(s);
+ const label=(behaviorFields.find(x=>x[0]===k)||[])[1]||k;
+ if(!s.behaviors[k].length){alert('لا توجد واقعة مسجلة للتراجع عنها.');return;}
+ if(!confirm('التراجع عن آخر تسجيل لـ «'+label+'»؟'))return;
+ s.behaviors[k].pop();save();renderContent(c);
+}
+
+/* ===== جدول الدرجات الجديد ===== */
+function renderTable(c,students){
+ if(!students.length)return '<div class="empty">لا يوجد طلاب بعد — أضف أول طالب من الأعلى.</div>';
+ return `<table><thead><tr>
+ <th>م</th><th class="name-cell">اسم الطالب</th><th>ملاحظات 🔒</th>
+ ${behaviorFields.slice(1).map(x=>`<th>${x[1]}</th>`).join('')}
+ <th>غياب</th>${[1,2,3,4,5,6].map(x=>`<th>حفظ ${x}</th>`).join('')}
+ <th>المجموع /60</th>${[1,2,3,4].map(x=>`<th>اختبار قصير ${x}</th>`).join('')}
+ <th>مجموع القصيرة</th><th>اختبار 1</th><th>اختبار 2</th><th>المجموع /300</th>
+ <th>حذف</th><th>إدارة</th></tr></thead><tbody>
+ ${students.map((s,i)=>{ensureStudentExtras(s);
+ const total=s.mem.reduce((a,b)=>a+(+b||0),0),st=s.short.reduce((a,b)=>a+(+b||0),0),g=total+st+(+s.t1||0)+(+s.t2||0);
+ return `<tr><td>${i+1}</td><td class="name-cell">${s.name}</td><td>${notePreview(c,i)}</td>
+ ${behaviorFields.slice(1).map(([k])=>`<td><div class="behavior-cell"><button class="behavior-btn" onclick="addBehavior('${c}',${i},'${k}')">${behaviorCount(s,k)}</button>${behaviorCount(s,k)?`<button class="behavior-undo" onclick="undoBehavior('${c}',${i},'${k}')">↩ تراجع</button>`:''}</div></td>`).join('')}
+ <td>${s.abs||0}</td>
+ ${s.mem.map((v,x)=>`<td><input type="number" min="0" max="10" value="${v??''}" onchange="setMem('${c}',${i},${x},this.value)"></td>`).join('')}
+ <td>${total}</td>
+ ${s.short.map((v,x)=>`<td><input type="number" min="0" max="10" value="${v??''}" onchange="setShort('${c}',${i},${x},this.value)"></td>`).join('')}
+ <td>${st}</td><td><input type="number" min="0" max="100" value="${s.t1??''}" onchange="setField('${c}',${i},'t1',this.value)"></td>
+ <td><input type="number" min="0" max="100" value="${s.t2??''}" onchange="setField('${c}',${i},'t2',this.value)"></td><td>${g}</td>
+ <td><button class="danger" onclick="removeStudent('${c}',${i})">حذف</button></td>
+ <td><div class="student-admin-actions"><button class="student-edit-btn" onclick="editStudentName('${c}',${i})">تعديل الاسم</button><button class="student-move-btn" onclick="moveStudentToRow('${c}',${i})">نقل</button></div></td></tr>`}).join('')}
+ </tbody></table>`;
+}
+
+/* ===== الترتيب ===== */
+function reportGroup(c){
+ return c==='الصف السادس الابتدائي أ'||c==='الصف السادس الابتدائي ب'
+ ?['الصف السادس الابتدائي أ','الصف السادس الابتدائي ب']:[c];
+}
+function rankForStudent(c,s){
+ const group=reportGroup(c).flatMap(cls=>(data[cls]?.students||[]).map(x=>({s:x,score:studentScore(x)}))).sort((a,b)=>b.score-a.score);
+ return {rank:group.findIndex(x=>x.s===s)+1,total:group.length};
+}
+
+/* ===== تقرير الطالب مع خيارات المحتوى ===== */
+function studentReport(c,i,mode='both'){
+ if(i==='')return;
+ const s=data[c].students[i];ensureStudentExtras(s);
+ const info=rankForStudent(c,s);
+ let body=`<div class="summary"><div><b>ترتيب الطالب: ${info.rank} من ${info.total}</b></div><div>${reportGroup(c).length===2?'الترتيب على مستوى السادس أ + السادس ب':'الترتيب على مستوى الصف'}</div></div>`;
+ if(mode==='both'||mode==='grades'){
+  const mem=s.mem||[],sh=s.short||[];
+  body+=`<h3>الدرجات</h3><table><tbody><tr><th>اسم الطالب</th><td>${s.name}</td></tr><tr><th>الصف</th><td>${c}</td></tr><tr><th>الغياب</th><td>${s.abs||0}</td></tr><tr><th>التأخر</th><td>${s.late||0}</td></tr>${mem.map((v,x)=>`<tr><th>الحفظ ${x+1}</th><td>${v??0}/10</td></tr>`).join('')}<tr><th>مجموع الحفظ</th><td>${mem.reduce((a,b)=>a+(+b||0),0)}/60</td></tr>${sh.map((v,x)=>`<tr><th>الاختبار القصير ${x+1}</th><td>${v??0}/10</td></tr>`).join('')}<tr><th>الاختبار الأول</th><td>${s.t1??0}/100</td></tr><tr><th>الاختبار الثاني</th><td>${s.t2??0}/100</td></tr></tbody></table>`;
+ }
+ if(mode==='both'||mode==='behaviors') body+=fullBehaviorReport([s]);
+ openReport('تقرير الطالب: '+s.name,body);
+}
+
+/* ===== تقرير موحد للسادس أ + ب ===== */
+function sixthRanked(className){
+ return (data[className]?.students||[])
+  .map(s=>({s,c:className,score:studentScore(s)}))
+  .sort((a,b)=>b.score-a.score);
+}
+function sixthRankTable(items,title){
+ const avg=items.length?items.reduce((a,x)=>a+x.score,0)/items.length:0;
+ return `<h3 style="margin-top:24px">${title}</h3>
+ <div class="summary"><div>عدد الطلاب: ${items.length}</div><div>متوسط الدرجات: ${avg.toFixed(2)}</div></div>
+ <table class="report-score-table"><thead><tr><th>الترتيب</th><th>الطالب</th><th>المجموع /300</th></tr></thead>
+ <tbody>${items.map((x,i)=>`<tr><td>${i+1}</td><td>${x.s.name}</td><td class="score" style="background:${softColorFor(i,items.length)};color:#fff">${x.score.toFixed(1)}</td></tr>`).join('')}</tbody></table>`;
+}
+function combinedSixthReport(mode='grades'){
+ const aName='الصف السادس الابتدائي أ', bName='الصف السادس الابتدائي ب';
+ const a=sixthRanked(aName), b=sixthRanked(bName);
+ const students=[...a,...b].sort((x,y)=>y.score-x.score);
+ if(!students.length){alert('لا يوجد طلاب في الصف السادس أ + ب.');return;}
+ let body='';
+ if(mode==='grades'||mode==='both'){
+   const avg=students.reduce((sum,x)=>sum+x.score,0)/students.length;
+   body+=`<h3>🏆 الترتيب الموحد للصفين السادس أ + ب</h3>
+   <div class="summary"><div>عدد الطلاب: ${students.length}</div><div>المتوسط العام: ${avg.toFixed(2)}</div></div>
+   <table class="report-score-table"><thead><tr><th>الترتيب</th><th>الطالب</th><th>الصف</th><th>المجموع /300</th></tr></thead>
+   <tbody>${students.map((x,i)=>`<tr><td>${i+1}</td><td>${x.s.name}</td><td>${x.c}</td><td class="score" style="background:${softColorFor(i,students.length)};color:#fff">${x.score.toFixed(1)}</td></tr>`).join('')}</tbody></table>`;
+   body+=sixthRankTable(a,'📘 ترتيب طلاب الصف السادس الابتدائي أ');
+   body+=sixthRankTable(b,'📗 ترتيب طلاب الصف السادس الابتدائي ب');
+ }
+ if(mode==='behaviors'||mode==='both') body+=fullBehaviorReport(students);
+ openReport('تقرير طلاب الصف السادس الابتدائي أ + ب',body);
+}
+
+/* ===== تقرير الحضور والغياب فقط ===== */
+function attendanceReport(c){
+ const students=data[c].students||[];
+ const days=Object.keys(data[c].attendance||{}).sort();
+ const body=`<div class="summary"><div>👨‍🎓 عدد الطلاب: ${students.length}</div><div>📅 أيام الحضور المسجلة: ${days.length}</div></div><table><thead><tr><th>م</th><th>الطالب</th><th>الحضور</th><th>الغياب</th></tr></thead><tbody>${students.map((s,i)=>{let abs=0;days.forEach(d=>{if(data[c].attendance[d]?.[i]==='absent')abs++;});const present=Math.max(0,days.length-abs);return `<tr><td>${i+1}</td><td>${s.name}</td><td>${present}</td><td>${abs}</td></tr>`;}).join('')}</tbody></table>${days.length?`<div class="card" style="margin-top:18px"><h3>تفاصيل أيام الغياب</h3><table><thead><tr><th>الطالب</th>${days.map(d=>`<th>${formatReportDate(d)}</th>`).join('')}</tr></thead><tbody>${students.map((s,i)=>`<tr><td>${s.name}</td>${days.map(d=>`<td>${data[c].attendance[d]?.[i]==='absent'?'غائب':'حاضر'}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`:'<div class="sub">لا توجد أيام حضور مسجلة بعد.</div>'}`;
+ openReport(c+' — تقرير الحضور والغياب',body);
+}
+function formatReportDate(d){try{return new Date(d+'T00:00:00').toLocaleDateString('ar-SA',{calendar:'gregory',year:'numeric',month:'numeric',day:'numeric',numberingSystem:'latn'});}catch(e){return d;}}
+
+/* ===== شاشة التقارير ===== */
+function reportsView(c){
+ return `<div class="report-choice">
+ <button class="report-card-btn" onclick="classReport('${c}')"><h3>📊 تقرير ${c} كاملًا</h3><div class="sub">ترتيب خاص بهذا الصف ومتوسط ورسم بياني وسلوكيات.</div></button>
+ <button class="report-card-btn" onclick="attendanceReport('${c}')"><h3>📅 تقرير الحضور والغياب</h3><div class="sub">خاص بهذا الصف فقط ويعرض الحضور والغياب دون التأخر أو الدرجات.</div></button>
+ <div class="card"><h3>📋 تقرير خانة واحدة لجميع طلاب الصف</h3><select id="singleReportField">${gradeFields.map(f=>`<option value="${f.key}">${f.label}</option>`).join('')}</select><button style="margin-top:10px" onclick="classReport('${c}',document.getElementById('singleReportField').value)">إنشاء التقرير</button></div>
+ </div>
+ <div class="card"><h3>👤 تقرير طالب</h3><select id="studentReportSelect"><option value="">اختر الطالب</option>${data[c].students.map((s,i)=>`<option value="${i}">${s.name}</option>`).join('')}</select>
+ <div class="report-mode-actions"><button onclick="studentReport('${c}',document.getElementById('studentReportSelect').value,'both')">الدرجات والسلوكيات</button><button class="secondary" onclick="studentReport('${c}',document.getElementById('studentReportSelect').value,'grades')">الدرجات فقط</button><button class="secondary" onclick="studentReport('${c}',document.getElementById('studentReportSelect').value,'behaviors')">السلوكيات فقط</button></div></div>
+ ${c==='الصف السادس الابتدائي أ'||c==='الصف السادس الابتدائي ب'?`<div class="card"><h3>🏆 تقارير الصف السادس أ + ب</h3><div class="sub">يتضمن التقرير الموحد ترتيب جميع الطلاب معًا، ثم ترتيب السادس أ وحده، ثم ترتيب السادس ب وحده.</div><div class="report-mode-actions"><button onclick="combinedSixthReport('both')">تقرير كامل</button><button class="secondary" onclick="combinedSixthReport('grades')">الدرجات فقط</button><button class="secondary" onclick="combinedSixthReport('behaviors')">السلوكيات فقط</button></div></div>`:''}`;
+}
+
+</script>
